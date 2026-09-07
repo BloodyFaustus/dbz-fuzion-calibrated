@@ -23,6 +23,13 @@ Included features:
 
 ## Credits and licensing
 
+Licensed under the [Apache License 2.0](LICENSE). You may use, modify and redistribute
+this, including commercially and in closed-source spin-offs, provided you keep the copyright
+notice and the [NOTICE](NOTICE) file, and state what you changed. The licence grants no rights
+to the author's name or branding.
+
+Third-party assets keep their own licences:
+
 Fonts: Russo One, Rajdhani, Barlow Semi Condensed — SIL Open Font License 1.1
 (licences ship in `styles/fonts/`).
 

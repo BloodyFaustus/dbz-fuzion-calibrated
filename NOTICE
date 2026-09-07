@@ -1,0 +1,34 @@
+DBZ Fuzion Redux - Calibrated GM Variant
+Copyright 2026 BloodyFaustus (https://github.com/BloodyFaustus)
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this work except in compliance with the License. A full copy is in the LICENSE
+file at the root of this repository, or at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Section 4(d) of the License requires that any Derivative Work you distribute
+includes a readable copy of the attribution notices in this NOTICE file. In
+plain terms: fork it, build on it, ship a spin-off if you like, but keep this
+file and credit BloodyFaustus.
+
+--------------------------------------------------------------------------
+Third-party assets bundled here, NOT covered by the Apache License:
+
+  styles/fonts/*.ttf
+    Russo One, Rajdhani, Barlow Semi Condensed.
+    SIL Open Font License 1.1 - https://scripts.sil.org/OFL
+
+  assets/icons/*.svg and assets/dbzf-sprite.svg
+    37 icons from https://game-icons.net, licensed CC BY 3.0
+    https://creativecommons.org/licenses/by/3.0/
+    Authors: Lorc, Delapouite, Carl Olsen, Felbrigg, DarkZaitzev, Zeromancer.
+    Per-file credits are in assets/icons/_attribution.csv.
+
+Reuse of those files must follow their own licences, not this one.
+--------------------------------------------------------------------------
+
+Dragon Ball is the property of Bird Studio / Shueisha / Toei Animation. This is
+an unofficial, non-commercial fan project, not affiliated with or endorsed by
+the rights holders. The Apache License above covers only the original code and
+text in this repository. It grants no rights in the Dragon Ball franchise.

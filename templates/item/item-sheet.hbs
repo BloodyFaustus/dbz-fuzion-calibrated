@@ -1,0 +1,292 @@
+<form class="{{cssClass}} dbzf-item-sheet" autocomplete="off">
+
+  <header class="dbzf-item-header" style="--edge:{{typeColor}}">
+    <div class="dbzf-item-header__icon" data-action="item-image" data-edit="img" title="{{item.name}} — click to change image">
+      <img src="{{item.img}}" alt="" />
+    </div>
+    <div class="dbzf-item-header__id">
+      <input class="dbzf-input--title" name="name" type="text" value="{{item.name}}" />
+      <span class="dbzf-label dbzf-item-header__type" style="--edge:{{typeColor}}">{{typeLabel}}</span>
+    </div>
+    {{#if supportsEffects}}
+      <label class="dbzf-check"><input name="system.active" type="checkbox" {{checked system.active}} />Active</label>
+    {{/if}}
+  </header>
+
+  <main class="dbzf-sheet-body" data-scroll-key="item-body">
+
+    {{#if supportsEffects}}
+      <section class="dbzf-item-section">
+        <h3 class="dbzf-panel__heading">
+          Effects
+          <button type="button" class="dbzf-btn dbzf-btn--dashed dbzf-btn--sm dbzf-spacer" data-action="effect-add">+ Add Effect</button>
+        </h3>
+        {{#each system.effects as |effect index|}}
+          <div class="dbzf-effect-row" data-effect-index="{{index}}" data-state="{{#unless effect.enabled}}off{{/unless}}">
+            <div class="dbzf-effect-row__top">
+              <input name="system.effects.{{index}}.enabled" data-effect-field="enabled" type="checkbox" {{checked effect.enabled}} title="Effect enabled" />
+              <input name="system.effects.{{index}}.label" data-effect-field="label" type="text" value="{{effect.label}}" placeholder="Effect name" />
+              <span class="dbzf-badge dbzf-effect-resolved" style="--c:{{#if effect.enabled}}var(--dbzf-ready){{else}}var(--dbzf-text-faint){{/if}}"
+                    title="Value this effect currently contributes">&rarr; {{effect.valueResolved}}{{#unless effect.enabled}} (off){{/unless}}</span>
+              <button type="button" class="dbzf-btn dbzf-btn--ghost-danger" data-action="effect-delete" data-index="{{index}}" title="Delete effect">&#10005;</button>
+            </div>
+            <div class="dbzf-effect-row__mid">
+              <select class="dbzf-effect-target" name="system.effects.{{index}}.target" data-effect-field="target">
+                {{selectOptions ../effectTargets selected=effect.target valueAttr="key" labelAttr="label"}}
+              </select>
+              <select class="dbzf-effect-mode" name="system.effects.{{index}}.mode" data-effect-field="mode">
+                {{selectOptions ../effectModes selected=effect.mode valueAttr="key" labelAttr="label"}}
+              </select>
+              <input class="dbzf-input--num dbzf-effect-value" name="system.effects.{{index}}.value" data-effect-field="value" type="number" value="{{effect.value}}" title="Flat value" />
+              <input class="dbzf-input--code dbzf-effect-formula" name="system.effects.{{index}}.valueFormula" data-effect-field="valueFormula" type="text" value="{{effect.valueFormula}}"
+                     placeholder="e.g. 15%(evasion)"
+                     title="Overrides the flat Value. Use skills (evasion, fighting...), characteristics (physical...), custom skill names, or a bare % of Battle Power. Resolved: {{effect.valueResolved}}" />
+            </div>
+            <details>
+              <summary class="dbzf-label dbzf-label--faint">Advanced &mdash; Ki cost, rules text</summary>
+              <div class="dbzf-effect-row__adv">
+                <div class="dbzf-field">
+                  <span class="dbzf-label">Ki Cost</span>
+                  <input class="dbzf-input--code" name="system.effects.{{index}}.kiCostRaw" data-effect-field="kiCostRaw" type="text" value="{{effect.kiCostRaw}}"
+                         placeholder="e.g. 10% + 5" title="Resolved: {{effect.kiCostResolved}}" />
+                </div>
+                <div class="dbzf-field">
+                  <span class="dbzf-label">Rules Text</span>
+                  <input name="system.effects.{{index}}.rulesText" data-effect-field="rulesText" type="text" value="{{effect.rulesText}}" placeholder="When does this apply?" />
+                </div>
+              </div>
+            </details>
+          </div>
+        {{else}}
+          <p class="dbzf-empty">No effects yet &mdash; add one to change a stat, resource or attack.</p>
+        {{/each}}
+      </section>
+
+      <section class="dbzf-item-section">
+        <h3 class="dbzf-panel__heading">Qualities</h3>
+        {{#each embeddedQualities as |quality index|}}
+          <div class="dbzf-quality-row" data-quality-index="{{index}}">
+            <input name="system.embeddedQualities.{{index}}.uuid" data-quality-field="uuid" type="hidden" value="{{quality.uuid}}" />
+            <input name="system.embeddedQualities.{{index}}.rulesText" data-quality-field="rulesText" type="hidden" value="{{quality.rulesText}}" />
+            <svg class="dbzf-icon" style="color:var(--dbzf-warn)" aria-hidden="true"><use href="#dbzf-item-quality"></use></svg>
+            <input name="system.embeddedQualities.{{index}}.name" data-quality-field="name" type="text" value="{{quality.name}}" placeholder="Name" />
+            <input name="system.embeddedQualities.{{index}}.key" data-quality-field="key" type="text" value="{{quality.key}}" placeholder="key" style="width:96px" />
+            <label>Rating<input name="system.embeddedQualities.{{index}}.rating" data-quality-field="rating" type="number" class="dbzf-input--num" value="{{quality.rating}}" /></label>
+            <label><input name="system.embeddedQualities.{{index}}.costKi" data-quality-field="costKi" type="checkbox" {{checked quality.costKi}} />Costs Ki</label>
+            <label title="Override Ki cost per rating; 0 uses the default quality cost.">Cost<input name="system.embeddedQualities.{{index}}.cost" data-quality-field="cost" type="number" class="dbzf-input--num" value="{{quality.cost}}" /></label>
+            <button type="button" class="dbzf-btn dbzf-btn--ghost-danger dbzf-spacer" data-action="quality-delete" data-index="{{index}}" title="Remove quality">&#10005;</button>
+          </div>
+        {{else}}
+          <p class="dbzf-empty">Drop Quality items here</p>
+        {{/each}}
+      </section>
+    {{/if}}
+
+    {{#if (eq item.type "technique")}}
+      <section class="dbzf-panel">
+        <h3 class="dbzf-panel__heading">Technique</h3>
+        <div class="dbzf-grid-3">
+          <div class="dbzf-field"><span class="dbzf-label">Attack Type</span>
+            <select name="system.attackType">
+              <option value="fighting" {{#if (eq system.attackType "fighting")}}selected{{/if}}>Fighting</option>
+              <option value="power" {{#if (eq system.attackType "power")}}selected{{/if}}>Power</option>
+              <option value="weapon" {{#if (eq system.attackType "weapon")}}selected{{/if}}>Weapon</option>
+              <option value="body" {{#if (eq system.attackType "body")}}selected{{/if}}>Body</option>
+              <option value="evasion" {{#if (eq system.attackType "evasion")}}selected{{/if}}>Evasion</option>
+              <option value="mind" {{#if (eq system.attackType "mind")}}selected{{/if}}>Mind</option>
+              <option value="custom" {{#if (eq system.attackType "custom")}}selected{{/if}}>Custom Skill</option>
+              <option value="all" {{#if (eq system.attackType "all")}}selected{{/if}}>Any</option>
+            </select>
+          </div>
+          <div class="dbzf-field"><span class="dbzf-label">Activation</span><input name="system.activation" type="text" value="{{system.activation}}" placeholder="Action / Reaction / Passive" /></div>
+          <div class="dbzf-field"><span class="dbzf-label">Extra Dice</span><input name="system.extraDice" type="number" class="dbzf-input--num" value="{{system.extraDice}}" /></div>
+          <div class="dbzf-field"><span class="dbzf-label">Ki Cost</span>
+            <span class="dbzf-stat-inline">
+              <input class="dbzf-input--code" name="system.kiCostRaw" type="text" value="{{system.kiCostRaw}}" placeholder="e.g. 10% + 5" style="flex:1;width:auto" />
+              <output style="color:var(--dbzf-ki);font-weight:700" title="Resolved at the owner's Battle Power">= {{system.kiCostResolved}}</output>
+            </span>
+          </div>
+          <div class="dbzf-field"><span class="dbzf-label">Tags</span><input name="system.tags" type="text" value="{{system.tags}}" /></div>
+          <div class="dbzf-field"><span class="dbzf-label dbzf-label--faint">Upgrade Counter</span><input name="system.upgradeCount" type="number" class="dbzf-input--num" value="{{system.upgradeCount}}" title="How many upgrades/improvements you have made to this technique (tracking only)." /></div>
+        </div>
+        <div class="dbzf-field"><span class="dbzf-label">Qualities</span><input name="system.qualities" type="text" value="{{system.qualities}}" placeholder="e.g. Deadly 2; Rapid 1" /></div>
+        <label class="dbzf-check"><input name="system.zeroDamage" type="checkbox" {{checked system.zeroDamage}} />Deals no damage &mdash; effects and conditions only</label>
+        <div class="dbzf-editor-field"><span class="dbzf-label">Rules Text</span><prose-mirror name="system.boosts" value="{{system.boosts}}" toggled>{{{enriched.boosts}}}</prose-mirror></div>
+        <div class="dbzf-editor-field"><span class="dbzf-label">Description</span><prose-mirror name="system.description" value="{{system.description}}" toggled>{{{enriched.description}}}</prose-mirror></div>
+      </section>
+    {{/if}}
+
+    {{#if (eq item.type "weapon")}}
+      <section class="dbzf-panel">
+        <h3 class="dbzf-panel__heading">Weapon</h3>
+        <div class="dbzf-grid-2">
+          <div class="dbzf-field"><span class="dbzf-label">Damage Dice</span><input name="system.damageDice" type="number" class="dbzf-input--num" value="{{system.damageDice}}" title="Added to the Weapon attack's damage dice pool" /></div>
+          <div class="dbzf-field"><span class="dbzf-label">Qualities</span><input name="system.qualities" type="text" value="{{system.qualities}}" placeholder="e.g. Deadly 2; Rapid 1" /></div>
+        </div>
+        <div class="dbzf-editor-field"><span class="dbzf-label">Description</span><prose-mirror name="system.description" value="{{system.description}}" toggled>{{{enriched.description}}}</prose-mirror></div>
+      </section>
+    {{/if}}
+
+    {{#if (eq item.type "armor")}}
+      <section class="dbzf-panel">
+        <h3 class="dbzf-panel__heading">Armor</h3>
+        <div class="dbzf-grid-3">
+          <div class="dbzf-field"><span class="dbzf-label">Defense Bonus</span><input name="system.defenseBonus" type="number" class="dbzf-input--num" value="{{system.defenseBonus}}" title="Added to Defense while worn and undestroyed" /></div>
+          <div class="dbzf-field"><span class="dbzf-label">Armor HP</span><input name="system.currentHits" type="number" class="dbzf-input--num" value="{{system.currentHits}}" /></div>
+          <div class="dbzf-field"><span class="dbzf-label">Armor HP Max</span><input name="system.bonusHits" type="number" class="dbzf-input--num" value="{{system.bonusHits}}" /></div>
+        </div>
+        <div class="dbzf-field">
+          <div class="dbzf-row"><span class="dbzf-label">Armor HP</span><span class="dbzf-item-card__meta dbzf-spacer">{{system.currentHits}} / {{system.bonusHits}}</span></div>
+          <div class="dbzf-meter"><div class="dbzf-meter__fill" style="--fill:{{armorPct}}%"></div></div>
+          <span class="dbzf-note">A separate absorbing layer &mdash; not added to max HITs. Damage hits Temp HITs, then Armor HP, then HITs. At 0 the armor is destroyed and its Defense bonus is lost.</span>
+        </div>
+        <label class="dbzf-check" style="color:var(--dbzf-danger);text-transform:uppercase;letter-spacing:.05em;font-weight:700"><input name="system.destroyed" type="checkbox" {{checked system.destroyed}} />Destroyed</label>
+        <div class="dbzf-field"><span class="dbzf-label">Qualities</span><input name="system.qualities" type="text" value="{{system.qualities}}" /></div>
+        <div class="dbzf-editor-field"><span class="dbzf-label">Description</span><prose-mirror name="system.description" value="{{system.description}}" toggled>{{{enriched.description}}}</prose-mirror></div>
+      </section>
+    {{/if}}
+
+    {{#if (eq item.type "quality")}}
+      <section class="dbzf-panel">
+        <h3 class="dbzf-panel__heading">Quality</h3>
+        <div class="dbzf-grid-3">
+          <div class="dbzf-field"><span class="dbzf-label">Key</span><input class="dbzf-input--code" name="system.key" type="text" value="{{system.key}}" /></div>
+          <div class="dbzf-field"><span class="dbzf-label">Type</span><input name="system.type" type="text" value="{{system.type}}" /></div>
+          <div class="dbzf-field"><span class="dbzf-label">Rating</span><input name="system.rating" type="number" class="dbzf-input--num" value="{{system.rating}}" /></div>
+          <div class="dbzf-field"><span class="dbzf-label">Cost</span><input name="system.cost" type="number" class="dbzf-input--num" value="{{system.cost}}" title="Ki cost per rating" /></div>
+          <div class="dbzf-field" style="grid-column:span 2"><span class="dbzf-label">Mechanics</span><input name="system.mechanics" type="text" value="{{system.mechanics}}" /></div>
+        </div>
+        <label class="dbzf-check"><input name="system.commonModifier" type="checkbox" {{checked system.commonModifier}} />Common Modifier &mdash; counts against the attack's normal modifier capacity</label>
+        <div class="dbzf-editor-field"><span class="dbzf-label">Rules Text</span><prose-mirror name="system.rulesText" value="{{system.rulesText}}" toggled>{{{enriched.rulesText}}}</prose-mirror></div>
+      </section>
+    {{/if}}
+
+    {{#if (eq item.type "transformation")}}
+      <section class="dbzf-panel">
+        <h3 class="dbzf-panel__heading">Transformation</h3>
+        <div class="dbzf-field"><span class="dbzf-label">Multipliers</span><input class="dbzf-input--code" name="system.multipliers" type="text" value="{{system.multipliers}}" placeholder="e.g. BP x2.5, Physical x2.5" /></div>
+        <div class="dbzf-grid-2">
+          <div class="dbzf-field"><span class="dbzf-label">Cost</span><input name="system.cost" type="text" value="{{system.cost}}" /></div>
+          <div class="dbzf-field"><span class="dbzf-label">Duration</span><input name="system.duration" type="text" value="{{system.duration}}" /></div>
+        </div>
+        <div class="dbzf-editor-field"><span class="dbzf-label">Rules Text</span><prose-mirror name="system.rulesText" value="{{system.rulesText}}" toggled>{{{enriched.rulesText}}}</prose-mirror></div>
+      </section>
+    {{/if}}
+
+    {{#if (eq item.type "species")}}
+      <section class="dbzf-panel">
+        <h3 class="dbzf-panel__heading">Species</h3>
+        <div class="dbzf-grid-2">
+          <div class="dbzf-field"><span class="dbzf-label">Species Key</span><input class="dbzf-input--code" name="system.speciesKey" type="text" value="{{system.speciesKey}}" /></div>
+          <div class="dbzf-field"><span class="dbzf-label">Variant</span><input name="system.variant" type="text" value="{{system.variant}}" /></div>
+          <div class="dbzf-field"><span class="dbzf-label">Rules Mode</span><input class="dbzf-input--code" name="system.rulesMode" type="text" value="{{system.rulesMode}}" /></div>
+          {{!-- These are free-text StringFields in the schema, not enums. A fixed <select> would
+                display the wrong value for any custom mode and overwrite it on submit, so they stay
+                text inputs with a datalist of the modes the rules actually recognise. --}}
+          <div class="dbzf-field"><span class="dbzf-label">Ki Charge Mode</span>
+            <input class="dbzf-input--code" name="system.kiChargeMode" type="text" list="dbzf-ki-charge-modes" value="{{system.kiChargeMode}}" />
+            <datalist id="dbzf-ki-charge-modes">
+              <option value="normal"></option>
+              <option value="androidLimited"></option>
+              <option value="androidInfinite"></option>
+            </datalist>
+          </div>
+          <div class="dbzf-field"><span class="dbzf-label">Regeneration Mode</span>
+            <input class="dbzf-input--code" name="system.regenerationMode" type="text" list="dbzf-regen-modes" value="{{system.regenerationMode}}" />
+            <datalist id="dbzf-regen-modes">
+              <option value="normal"></option>
+              <option value="namekian"></option>
+              <option value="namekianWarrior"></option>
+              <option value="namekianDragon"></option>
+              <option value="namekianDemon"></option>
+              <option value="majinBoo"></option>
+              <option value="none"></option>
+            </datalist>
+          </div>
+          <div class="dbzf-field"><span class="dbzf-label">Sense Detection</span><input class="dbzf-input--code" name="system.senseDetectionMode" type="text" value="{{system.senseDetectionMode}}" /></div>
+          <div class="dbzf-field"><span class="dbzf-label">XP Multiplier</span><input name="system.xpMultiplier" type="number" step="0.01" class="dbzf-input--num" value="{{system.xpMultiplier}}" /></div>
+          <div class="dbzf-field"><span class="dbzf-label">Fight XP Multiplier</span><input name="system.xpFightMultiplier" type="number" step="0.01" class="dbzf-input--num" value="{{system.xpFightMultiplier}}" /></div>
+        </div>
+        <div class="dbzf-field"><span class="dbzf-label">Traits</span><input name="system.traits" type="text" value="{{system.traits}}" /></div>
+        <div class="dbzf-editor-field"><span class="dbzf-label">Rules Text</span><prose-mirror name="system.rulesText" value="{{system.rulesText}}" toggled>{{{enriched.rulesText}}}</prose-mirror></div>
+        <div class="dbzf-editor-field"><span class="dbzf-label">Description</span><prose-mirror name="system.description" value="{{system.description}}" toggled>{{{enriched.description}}}</prose-mirror></div>
+      </section>
+    {{/if}}
+
+    {{#if (eq item.type "trait")}}
+      <section class="dbzf-panel">
+        <h3 class="dbzf-panel__heading">Trait</h3>
+        <div class="dbzf-grid-2">
+          <div class="dbzf-field"><span class="dbzf-label">Category</span><input name="system.category" type="text" value="{{system.category}}" /></div>
+          <div class="dbzf-field"><span class="dbzf-label">Upgrade Counter</span><input name="system.upgradeCount" type="number" class="dbzf-input--num" value="{{system.upgradeCount}}" title="How many upgrades/improvements you have made to this trait (tracking only)." /></div>
+          <div class="dbzf-field" style="grid-column:span 2"><span class="dbzf-label">Cost</span>
+            <span class="dbzf-stat-inline">
+              <input class="dbzf-input--code" name="system.cost" type="text" value="{{system.cost}}" placeholder="e.g. 10% + 5" title="Plain numbers and/or % of Battle Power" style="flex:1;width:auto" />
+              <output style="color:var(--dbzf-ki);font-weight:700">= {{system.costResolved}}</output>
+            </span>
+          </div>
+        </div>
+        <div class="dbzf-editor-field"><span class="dbzf-label">Rules Text</span><prose-mirror name="system.rulesText" value="{{system.rulesText}}" toggled>{{{enriched.rulesText}}}</prose-mirror></div>
+        <div class="dbzf-editor-field"><span class="dbzf-label">Description</span><prose-mirror name="system.description" value="{{system.description}}" toggled>{{{enriched.description}}}</prose-mirror></div>
+      </section>
+    {{/if}}
+
+    {{#if (eq item.type "boost")}}
+      <section class="dbzf-panel">
+        <h3 class="dbzf-panel__heading">Boost</h3>
+        <div class="dbzf-grid-2">
+          <div class="dbzf-field"><span class="dbzf-label">Activation Cost</span>
+            <select name="system.activationCost">
+              <option value="none" {{#if (eq system.activationCost "none")}}selected{{/if}}>None / Passive</option>
+              <option value="action" {{#if (eq system.activationCost "action")}}selected{{/if}}>Action</option>
+              <option value="reaction" {{#if (eq system.activationCost "reaction")}}selected{{/if}}>Reaction</option>
+              <option value="actionReaction" {{#if (eq system.activationCost "actionReaction")}}selected{{/if}}>Action + Reaction</option>
+            </select>
+          </div>
+          <div class="dbzf-field"><span class="dbzf-label">Upgrade Counter</span><input name="system.upgradeCount" type="number" class="dbzf-input--num" value="{{system.upgradeCount}}" title="How many upgrades/improvements you have made to this boost (tracking only)." /></div>
+          <div class="dbzf-field" style="grid-column:span 2"><span class="dbzf-label">Cost</span>
+            <span class="dbzf-stat-inline">
+              <input class="dbzf-input--code" name="system.cost" type="text" value="{{system.cost}}" placeholder="e.g. 10% + 5" title="Plain numbers and/or % of Battle Power" style="flex:1;width:auto" />
+              <output style="color:var(--dbzf-ki);font-weight:700">= {{system.costResolved}}</output>
+            </span>
+          </div>
+          <div class="dbzf-field"><span class="dbzf-label">Duration Phases</span><input name="system.durationPhases" type="number" min="0" class="dbzf-input--num" value="{{system.durationPhases}}" title="0 = indefinite" /></div>
+          <div class="dbzf-field"><span class="dbzf-label">Remaining Phases</span><input name="system.remainingPhases" type="number" min="0" class="dbzf-input--num" value="{{system.remainingPhases}}" /></div>
+        </div>
+        {{#if system.durationPhases}}
+          <div class="dbzf-field">
+            <div class="dbzf-row"><span class="dbzf-label">Remaining</span><span class="dbzf-item-card__meta dbzf-spacer">{{system.remainingPhases}} / {{system.durationPhases}}</span></div>
+            <div class="dbzf-meter"><div class="dbzf-meter__fill" style="--fill:{{boostPct}}%;--c:var(--dbzf-ki)"></div></div>
+          </div>
+        {{/if}}
+        <label class="dbzf-check"><input name="system.showChatOnActivation" type="checkbox" {{checked system.showChatOnActivation}} />Post a chat card when activated</label>
+        <div class="dbzf-editor-field"><span class="dbzf-label">Rules Text</span><prose-mirror name="system.rulesText" value="{{system.rulesText}}" toggled>{{{enriched.rulesText}}}</prose-mirror></div>
+        <div class="dbzf-editor-field"><span class="dbzf-label">Description</span><prose-mirror name="system.description" value="{{system.description}}" toggled>{{{enriched.description}}}</prose-mirror></div>
+      </section>
+    {{/if}}
+
+    {{#if (eq item.type "equipment")}}
+      <section class="dbzf-panel">
+        <h3 class="dbzf-panel__heading">Equipment</h3>
+        <div class="dbzf-grid-2">
+          <div class="dbzf-field"><span class="dbzf-label">Category</span><input name="system.category" type="text" value="{{system.category}}" /></div>
+          <div class="dbzf-field"><span class="dbzf-label">Quantity</span><input name="system.quantity" type="number" class="dbzf-input--num" value="{{system.quantity}}" /></div>
+        </div>
+        <div class="dbzf-editor-field"><span class="dbzf-label">Description</span><prose-mirror name="system.description" value="{{system.description}}" toggled>{{{enriched.description}}}</prose-mirror></div>
+      </section>
+    {{/if}}
+
+    {{#if (eq item.type "consumable")}}
+      <section class="dbzf-panel">
+        <h3 class="dbzf-panel__heading">Consumable</h3>
+        <div class="dbzf-grid-2">
+          <div class="dbzf-field"><span class="dbzf-label">Quantity</span><input name="system.quantity" type="number" class="dbzf-input--num" value="{{system.quantity}}" /></div>
+          <div class="dbzf-field"><span class="dbzf-label">Activation</span><input name="system.activation" type="text" value="{{system.activation}}" /></div>
+        </div>
+        <div class="dbzf-editor-field"><span class="dbzf-label">Effect</span><prose-mirror name="system.effect" value="{{system.effect}}" toggled>{{{enriched.effect}}}</prose-mirror></div>
+        <div class="dbzf-editor-field"><span class="dbzf-label">Description</span><prose-mirror name="system.description" value="{{system.description}}" toggled>{{{enriched.description}}}</prose-mirror></div>
+      </section>
+    {{/if}}
+
+  </main>
+</form>

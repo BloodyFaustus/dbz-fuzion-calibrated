@@ -1,0 +1,16 @@
+<article class="dbzf-chat-card" data-kind="attack">
+  <header>
+    <h3>{{label}}</h3>
+    <p>{{actorName}}</p>
+  </header>
+  <div class="dbzf-chat-total" title="{{rollResult}}">{{total}}</div>
+  <details>
+    <summary>Details</summary>
+    <p>{{formulaLabel}}</p>
+    <ul>
+      {{#each breakdown as |line|}}
+        <li>{{line}}</li>
+      {{/each}}
+    </ul>
+  </details>
+</article>

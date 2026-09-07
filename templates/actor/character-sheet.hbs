@@ -1,0 +1,454 @@
+<form class="{{cssClass}} dbzf-character-sheet" autocomplete="off">
+
+  <header class="dbzf-sheet-header">
+    <div class="dbzf-portrait-col">
+      <div class="dbzf-portrait" data-action="actor-image" data-aura="{{#if ui.auraOn}}on{{else}}off{{/if}}"
+           style="--aura:{{ui.aura}}" title="{{actor.name}} — click to change portrait">
+        <img src="{{actor.img}}" alt="" />
+      </div>
+      {{#if ui.isTransformed}}
+        <span class="dbzf-form-name" style="--aura:{{ui.aura}}">{{ui.formLabel}}</span>
+      {{/if}}
+    </div>
+
+    <div class="dbzf-header-main">
+      <div class="dbzf-header-identity">
+        <input class="dbzf-input--title" name="name" type="text" value="{{actor.name}}" title="Character name" />
+        <select class="dbzf-select-species dbzf-hide-sm" name="system.identity.species" title="Species">
+          <option value="">Custom / Unset</option>
+          {{selectOptions speciesChoices selected=system.identity.species valueAttr="key" labelAttr="label"}}
+        </select>
+        <select class="dbzf-select-form" name="system.transformation.selected" data-aura="{{#if ui.auraOn}}on{{else}}off{{/if}}" style="--aura:{{ui.aura}}" title="Active Form">
+          {{selectOptions transformationChoices selected=system.transformation.selected valueAttr="key" labelAttr="label"}}
+        </select>
+
+        <div class="dbzf-phase-block dbzf-hide-sm">
+          <div class="dbzf-phase-stat" title="Current phase">
+            <span class="dbzf-label">Phase</span>
+            <span class="dbzf-readout">{{system.combatState.phaseCounter}}</span>
+          </div>
+          <div class="dbzf-recovery-block" title="Recovery fires every {{recovery.phasesRequired}} phase(s)">
+            <svg class="dbzf-icon dbzf-icon--lg" style="color:var(--dbzf-ready)" aria-hidden="true"><use href="{{ui.sprite}}#dbzf-state-recovery"></use></svg>
+            <div class="dbzf-field">
+              <span class="dbzf-label">Recovery</span>
+              <span class="dbzf-readout">{{system.combatState.phasesSinceRecovery}}/{{recovery.phasesRequired}}</span>
+            </div>
+          </div>
+          <button type="button" class="dbzf-btn dbzf-btn--ghost" data-action="recovery-settings" title="Phase Recovery Settings">
+            <i class="fas fa-cog"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="dbzf-hits-block">
+        <div class="dbzf-hits-line">
+          <input class="dbzf-hits-input" name="system.resources.hits.value" type="number"
+                 data-state="{{#if ui.isNegative}}danger{{/if}}"
+                 value="{{system.resources.hits.value}}" title="Current HITs" />
+          <span class="dbzf-label">HITs</span>
+          <span class="dbzf-layer-legend">
+            <span><span class="dbzf-dot" style="--c:var(--dbzf-temp-hits)">&#9670;</span> Temp <b>{{system.resources.tempHits.value}}/{{system.resources.tempHits.max}}</b></span>
+            {{#if ui.armor.max}}<span><span class="dbzf-dot" style="--c:var(--dbzf-armor)">&#9670;</span> Armor <b>{{ui.armor.value}}/{{ui.armor.max}}</b></span>{{/if}}
+            <span><span class="dbzf-dot" style="--c:var(--dbzf-hits)">&#9670;</span> HITs <b>{{system.resources.hits.value}}/{{system.resources.hits.max}}</b></span>
+          </span>
+        </div>
+        <div class="dbzf-resbar" data-state="{{#if ui.isNegative}}danger{{/if}}"
+             title="Damage order: Defense reduces the hit, then Temp HITs absorb, then Armor HP, then HITs.">
+          <div class="dbzf-resbar__seg" style="--w:{{ui.bar.tempWeight}}"><div class="dbzf-resbar__fill" style="--fill:{{ui.bar.tempPct}}%;--c:var(--dbzf-temp-hits)"></div></div>
+          {{#if ui.armor.max}}<div class="dbzf-resbar__seg" style="--w:{{ui.bar.armorWeight}}"><div class="dbzf-resbar__fill" style="--fill:{{ui.bar.armorPct}}%;--c:var(--dbzf-armor)"></div></div>{{/if}}
+          <div class="dbzf-resbar__seg" style="--w:{{ui.bar.hitsWeight}}"><div class="dbzf-resbar__fill" data-state="{{#if ui.isLow}}pulse{{/if}}" style="--fill:{{ui.bar.hitsPct}}%;--c:var(--dbzf-hits)"></div></div>
+        </div>
+        {{#if ui.isNegative}}
+          <span class="dbzf-survival-warn">Below zero &mdash; Survival Check required each phase</span>
+        {{/if}}
+      </div>
+
+      <div class="dbzf-header-stats">
+        <div class="dbzf-field dbzf-hide-sm" title="Temporary HITs — the first layer damage removes, before Armor and HITs">
+          <span class="dbzf-label">Temp HITs</span>
+          <span class="dbzf-stat-inline">
+            <input name="system.resources.tempHits.value" type="number" class="dbzf-input--num" value="{{system.resources.tempHits.value}}" />
+            <output>/ {{system.resources.tempHits.max}}</output>
+          </span>
+        </div>
+        <div class="dbzf-field dbzf-hide-sm" title="Charged Ki / capacity, and Ki spent so far">
+          <span class="dbzf-label">Ki</span>
+          <span class="dbzf-stat-inline">
+            <input name="system.resources.ki.value" type="number" class="dbzf-input--num" value="{{system.resources.ki.value}}" title="Charged Ki" />
+            <output>/ {{system.resources.ki.max}}</output>
+            <input name="system.resources.ki.spent" type="number" class="dbzf-input--num dbzf-w-sm" value="{{system.resources.ki.spent}}" title="Ki spent" />
+            <output class="dbzf-note">spent</output>
+          </span>
+        </div>
+        <div class="dbzf-field dbzf-hide-sm" title="Base Battle Power, then effective after transformation and effects">
+          <span class="dbzf-label">Battle Power</span>
+          <span class="dbzf-stat-inline">
+            <input name="system.resources.battlePower.value" type="number" class="dbzf-input--num" value="{{system.resources.battlePower.value}}" />
+            <output class="dbzf-big" style="color:{{ui.bpColor}}">&rarr; {{system.resources.battlePower.effective}}</output>
+          </span>
+        </div>
+        <div class="dbzf-field dbzf-hide-sm" title="Ki gained per Charge action. CaC % is editable; the total % adds techniques, traits and boosts on top.">
+          <span class="dbzf-label">Power Up</span>
+          <span class="dbzf-stat-inline">
+            <input name="system.resources.powerUp.baseCaC" type="number" class="dbzf-input--num dbzf-w-sm" value="{{system.resources.powerUp.baseCaC}}" title="Character-Creation base %" />
+            <output title="Total % in use, derived from CaC + effects">&rarr; {{system.resources.powerUp.percent}}%</output>
+            <output title="Charge value = total % of effective Battle Power">= {{system.resources.powerUp.value}}</output>
+          </span>
+        </div>
+        <div class="dbzf-field dbzf-hide-sm" title="Defense reduces every incoming hit before Temp HITs, Armor and HITs">
+          <span class="dbzf-label">Defense</span>
+          <output class="dbzf-defense-out">{{system.resources.defense.value}}</output>
+        </div>
+        <div class="dbzf-chip-group">
+          <button type="button" class="dbzf-chip" data-action="spend-action" data-state="{{#if system.combatState.actionAvailable}}ready{{else}}spent{{/if}}"
+                  title="Action {{#if system.combatState.actionAvailable}}ready &mdash; click to spend{{else}}spent{{/if}}">
+            <span class="dbzf-chip__dot"></span>Action
+          </button>
+          <button type="button" class="dbzf-chip" data-action="spend-reaction" data-state="{{#if system.combatState.reactionAvailable}}ready{{else}}spent{{/if}}"
+                  title="Reaction {{#if system.combatState.reactionAvailable}}ready &mdash; click to spend{{else}}spent{{/if}}">
+            <span class="dbzf-chip__dot"></span>Reaction
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="dbzf-tabs">
+    {{#each tabs as |tab|}}
+      <button type="button" class="dbzf-tab" data-action="tab" data-tab="{{tab.key}}" data-state="{{#if tab.active}}active{{/if}}">{{tab.label}}</button>
+    {{/each}}
+  </nav>
+
+  <main class="dbzf-sheet-body" data-scroll-key="actor-body">
+
+    {{!-- ============================ COMBAT ============================ --}}
+    <section class="dbzf-tab-panel" data-tab-panel="combat" {{#unless (eq activeTab "combat")}}hidden{{/unless}}>
+      <div class="dbzf-cols dbzf-cols--7-5">
+        <section class="dbzf-panel">
+          <h3 class="dbzf-panel__heading dbzf-panel__heading--lg">Attacks</h3>
+          <div class="dbzf-attack-grid">
+            {{#each attacksPrimary as |atk|}}
+              <button type="button" class="dbzf-btn dbzf-btn--primary" data-action="attack" data-attack="{{atk.key}}"
+                      title="{{atk.title}}" {{#unless ../system.combatState.actionAvailable}}disabled{{/unless}}>
+                <svg class="dbzf-icon" aria-hidden="true"><use href="{{../ui.sprite}}#dbzf-{{atk.icon}}"></use></svg>
+                <span>{{atk.label}}</span>
+                <span class="dbzf-btn__dice">{{atk.dice}}d6</span>
+              </button>
+            {{/each}}
+          </div>
+          <span class="dbzf-label dbzf-label--faint">Special Attacks</span>
+          <div class="dbzf-attack-grid dbzf-attack-grid--special">
+            {{#each attacksSpecial as |atk|}}
+              <button type="button" class="dbzf-btn dbzf-btn--outline" data-action="attack" data-attack="{{atk.key}}"
+                      title="{{atk.title}}" {{#unless ../system.combatState.actionAvailable}}disabled{{/unless}}>
+                <svg class="dbzf-icon" aria-hidden="true"><use href="{{../ui.sprite}}#dbzf-{{atk.icon}}"></use></svg>
+                <span>{{atk.label}}</span>
+                <span class="dbzf-btn__dice">{{atk.dice}}</span>
+              </button>
+            {{/each}}
+          </div>
+          <span class="dbzf-label dbzf-label--faint">Actions</span>
+          <div class="dbzf-actions">
+            <button type="button" class="dbzf-btn dbzf-btn--ki" data-action="power-up" title="Charge Ki: gain Power Up % of effective Battle Power" {{#unless system.combatState.actionAvailable}}disabled{{/unless}}>
+              <svg class="dbzf-icon" aria-hidden="true"><use href="{{ui.sprite}}#dbzf-action-charge-ki"></use></svg>Charge Ki
+              <span class="dbzf-readout">+{{system.resources.powerUp.value}}</span>
+            </button>
+            <button type="button" class="dbzf-btn dbzf-btn--outline" data-action="dodge" title="+50% Evasion this Phase; you cannot attack this Phase" {{#unless system.combatState.actionAvailable}}disabled{{/unless}}>
+              <svg class="dbzf-icon" aria-hidden="true"><use href="{{ui.sprite}}#dbzf-action-dodge"></use></svg>Dodge
+            </button>
+            <button type="button" class="dbzf-btn dbzf-btn--outline" data-action="run" title="Move up to 4x Move (1 Move = 3 m)" {{#unless system.combatState.actionAvailable}}disabled{{/unless}}>
+              <svg class="dbzf-icon" aria-hidden="true"><use href="{{ui.sprite}}#dbzf-action-run"></use></svg>Run
+              <span class="dbzf-readout">{{ui.runMeters}} m</span>
+            </button>
+            <button type="button" class="dbzf-btn dbzf-btn--outline" data-action="team-attack" title="Ready an Action: the targeted fighter gains 10% of a chosen Skill total" {{#unless system.combatState.actionAvailable}}disabled{{/unless}}>
+              <svg class="dbzf-icon" aria-hidden="true"><use href="{{ui.sprite}}#dbzf-action-team-attack"></use></svg>Team Attack
+            </button>
+            <button type="button" class="dbzf-btn dbzf-btn--outline" data-action="travel" title="Long-distance Ki flight">
+              <svg class="dbzf-icon" aria-hidden="true"><use href="{{ui.sprite}}#dbzf-action-travel"></use></svg>Travel
+            </button>
+          </div>
+        </section>
+
+        <section class="dbzf-panel">
+          <h3 class="dbzf-panel__heading dbzf-panel__heading--lg">Reactions</h3>
+          {{#each reactionGroups as |group|}}
+            <div class="dbzf-reaction-group">
+              <span class="dbzf-label dbzf-label--faint">{{group.label}}</span>
+              <div class="dbzf-actions">
+                {{#each group.items as |reaction|}}
+                  <button type="button" class="dbzf-btn dbzf-btn--outline dbzf-btn--sm" data-action="reaction" data-reaction="{{reaction.key}}"
+                          title="{{reaction.title}}" {{#unless ../../system.combatState.reactionAvailable}}disabled{{/unless}}>
+                    {{reaction.label}}{{#if reaction.ki}}<span class="dbzf-badge" style="--c:var(--dbzf-ki)">Ki</span>{{/if}}
+                  </button>
+                {{/each}}
+              </div>
+            </div>
+          {{/each}}
+        </section>
+      </div>
+
+      <div class="dbzf-cols dbzf-cols--7-5">
+        <section class="dbzf-panel">
+          <h3 class="dbzf-panel__heading dbzf-panel__heading--lg">Conditions</h3>
+          {{#each activeConditions as |condition|}}
+            <div class="dbzf-cond" style="--c:{{condition.color}}">
+              <svg class="dbzf-icon" style="color:{{condition.color}}" aria-hidden="true"><use href="{{../ui.sprite}}#dbzf-{{condition.icon}}"></use></svg>
+              <span class="dbzf-badge" style="--c:{{condition.color}};border:none;padding:0">{{condition.label}}</span>
+              <span class="dbzf-readout">{{condition.meta}}</span>
+              <span class="dbzf-item-card__tools">
+                {{#if condition.saveDC}}
+                  <button type="button" class="dbzf-btn dbzf-btn--ghost" data-action="condition-save" data-condition-id="{{condition.id}}">Save</button>
+                {{/if}}
+                <button type="button" class="dbzf-btn dbzf-btn--ghost-danger" data-action="condition-remove" data-condition-id="{{condition.id}}" title="Remove condition">&#10005;</button>
+              </span>
+              {{#if condition.summary}}<p class="dbzf-note dbzf-cond__body">{{condition.summary}}</p>{{/if}}
+            </div>
+          {{else}}
+            <p class="dbzf-empty">No active conditions</p>
+          {{/each}}
+        </section>
+
+        <section class="dbzf-panel">
+          <h3 class="dbzf-panel__heading dbzf-panel__heading--lg">
+            Combat State
+            <button type="button" class="dbzf-btn dbzf-btn--ghost dbzf-spacer" data-action="recovery-settings" title="Phase Recovery Settings"><i class="fas fa-cog"></i></button>
+          </h3>
+          <div class="dbzf-actions">
+            <button type="button" class="dbzf-btn dbzf-btn--outline dbzf-btn--sm" data-action="advance-phase" title="Advance phase counters and refresh Action and Reaction.">Advance Phase</button>
+            <button type="button" class="dbzf-btn dbzf-btn--outline dbzf-btn--sm" style="color:var(--dbzf-ready)" data-action="recover-hits" title="Apply phase HIT recovery.">Recover HITs</button>
+            <button type="button" class="dbzf-btn dbzf-btn--sm {{#if ui.isNegative}}dbzf-btn--danger{{else}}dbzf-btn--outline{{/if}}" data-action="survival-check" title="Roll Body against negative HITs as survival DC.">Survival Check</button>
+            <button type="button" class="dbzf-btn dbzf-btn--ghost dbzf-btn--sm" data-action="spend-action" title="Manually mark Action spent.">Spend Action</button>
+            <button type="button" class="dbzf-btn dbzf-btn--ghost dbzf-btn--sm" data-action="spend-reaction" title="Manually mark Reaction spent.">Spend Reaction</button>
+            <button type="button" class="dbzf-btn dbzf-btn--ghost dbzf-btn--sm" data-action="reset-phase" title="Refresh Action and Reaction without advancing counters.">Reset Phase</button>
+            <button type="button" class="dbzf-btn dbzf-btn--ghost dbzf-btn--sm" data-action="restart-phases" title="Restart phase counters at Phase 1.">Restart Phases</button>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    {{!-- =========================== CHARACTER =========================== --}}
+    <section class="dbzf-tab-panel" data-tab-panel="character" {{#unless (eq activeTab "character")}}hidden{{/unless}}>
+      <div class="dbzf-cols dbzf-cols--5-7">
+        <div class="dbzf-stack">
+          <section class="dbzf-panel">
+            <h3 class="dbzf-panel__heading dbzf-panel__heading--lg">Characteristics</h3>
+            <div class="dbzf-grid-2">
+              {{#each characteristics as |char|}}
+                <div class="dbzf-field">
+                  <span class="dbzf-label">{{char.label}}</span>
+                  <div class="dbzf-char-field">
+                    <input name="system.characteristics.{{char.key}}.base" type="number" class="dbzf-input--num" value="{{char.data.base}}" />
+                    <span class="dbzf-char-arrow">&rarr;</span>
+                    <output class="dbzf-char-eff" style="--c:{{char.color}}" title="{{char.formula}}">{{char.data.effective}}</output>
+                    {{#if char.boosted}}<span class="dbzf-badge" style="--c:{{char.color}}">{{char.multChip}}</span>{{/if}}
+                  </div>
+                </div>
+              {{/each}}
+            </div>
+            <div class="dbzf-actions">
+              <button type="button" class="dbzf-btn dbzf-btn--outline dbzf-btn--sm" data-action="derived-scaling-settings"
+                      title="Choose which characteristic drives HITs/Defense/Temp HITs and whether they scale from base or effective stats.">Derived Scaling</button>
+              <button type="button" class="dbzf-btn dbzf-btn--outline dbzf-btn--sm" data-action="reaction" data-reaction="raiseCharacteristic"
+                      title="Reaction: spend 10 Ki per point to raise Physical, Mental or Movement for 1 Phase. Combat cannot be raised."
+                      {{#unless system.combatState.reactionAvailable}}disabled{{/unless}}>Raise Characteristic</button>
+            </div>
+          </section>
+
+          <section class="dbzf-panel">
+            <h3 class="dbzf-panel__heading dbzf-panel__heading--lg">Transformation</h3>
+            <select name="system.transformation.selected" class="dbzf-select-form" data-aura="{{#if ui.auraOn}}on{{else}}off{{/if}}" style="--aura:{{ui.aura}};width:100%">
+              {{selectOptions transformationChoices selected=system.transformation.selected valueAttr="key" labelAttr="label"}}
+            </select>
+            <div class="dbzf-form-summary">
+              <div class="dbzf-field"><span class="dbzf-label">Battle Power</span><output class="dbzf-stat-inline dbzf-big" style="color:{{ui.accent}}">&times;{{ui.form.battlePower}}</output></div>
+              {{#if ui.form.actionType}}<div class="dbzf-field"><span class="dbzf-label">Activation</span><output>{{ui.form.actionType}}</output></div>{{/if}}
+              {{#if ui.form.duration}}<div class="dbzf-field"><span class="dbzf-label">Duration</span><output>{{ui.form.duration}}</output></div>{{/if}}
+            </div>
+            {{#if ui.form.costText}}<p class="dbzf-prose"><strong>Cost:</strong> {{ui.form.costText}}</p>{{/if}}
+            {{#if ui.form.multiplierText}}<p class="dbzf-prose">{{ui.form.multiplierText}}</p>{{/if}}
+            {{#if ui.form.rulesText}}<p class="dbzf-prose">{{ui.form.rulesText}}</p>{{/if}}
+            <p class="dbzf-note">{{ui.form.derivedNote}}</p>
+            <div class="dbzf-actions">
+              <button type="button" class="dbzf-btn dbzf-btn--outline dbzf-btn--sm" data-action="transformation-token-art"
+                      title="Assign token artwork for the form currently selected. Entering that form swaps the token; returning to Base restores the original.">Set Token Art for This Form</button>
+              {{#if ui.form.tokenArt}}<span class="dbzf-note">Art set for this form</span>{{/if}}
+            </div>
+          </section>
+        </div>
+
+        <section class="dbzf-panel dbzf-stack--sm">
+          <h3 class="dbzf-panel__heading dbzf-panel__heading--lg">Skills</h3>
+          <div class="dbzf-skill-row dbzf-skill-row--head">
+            <span class="dbzf-label dbzf-label--faint">Skill</span>
+            <span class="dbzf-label dbzf-label--faint" style="text-align:right">Rank</span>
+            <span class="dbzf-label dbzf-label--faint dbzf-skill-char">Char</span>
+            <span class="dbzf-label dbzf-label--faint dbzf-skill-val" style="text-align:right" title="Effective rank after transformations and effects">Eff</span>
+            <span class="dbzf-label dbzf-label--faint" style="text-align:right">Total</span>
+            <span></span>
+          </div>
+          {{#each skills as |skill|}}
+            <div class="dbzf-skill-row">
+              <span class="dbzf-skill-name">{{skill.label}}</span>
+              <input name="system.skills.{{skill.key}}.rank" type="number" class="dbzf-input--num" value="{{skill.data.rank}}" />
+              <span class="dbzf-skill-char">{{skill.characteristic}}</span>
+              <output class="dbzf-skill-val" style="--c:{{skill.color}}" title="{{skill.valueTitle}}">{{skill.data.effectiveRank}}</output>
+              <output class="dbzf-skill-total" title="{{skill.totalTitle}}">{{skill.data.total}}</output>
+              <button type="button" class="dbzf-roll-btn" data-action="roll-skill" data-skill="{{skill.key}}" title="Roll 3d6 + {{skill.data.total}}">d6</button>
+            </div>
+          {{/each}}
+
+          <details class="dbzf-item-section" {{#if customSkills.length}}open{{/if}}>
+            <summary class="dbzf-label">Custom Skills ({{customSkills.length}})</summary>
+            {{#each customSkills as |skill index|}}
+              <div class="dbzf-skill-row dbzf-skill-row--custom">
+                <input name="system.customSkills.{{index}}.name" type="text" value="{{skill.name}}" placeholder="Skill name" />
+                <input name="system.customSkills.{{index}}.rank" type="number" class="dbzf-input--num" value="{{skill.rank}}" />
+                <select name="system.customSkills.{{index}}.linkedCharacteristic" class="dbzf-skill-char">
+                  {{selectOptions ../characteristicChoices selected=skill.linkedCharacteristic valueAttr="key" labelAttr="label"}}
+                </select>
+                <input name="system.customSkills.{{index}}.value" type="number" class="dbzf-input--num dbzf-skill-val" value="{{skill.value}}" />
+                <output class="dbzf-skill-total">{{skill.total}}</output>
+                <button type="button" class="dbzf-roll-btn" data-action="roll-custom-skill" data-index="{{index}}" title="Roll 3d6 + {{skill.total}}">d6</button>
+                <button type="button" class="dbzf-btn dbzf-btn--ghost-danger" data-action="custom-skill-delete" data-index="{{index}}" title="Delete">&#10005;</button>
+              </div>
+            {{else}}
+              <p class="dbzf-empty">No custom skills yet</p>
+            {{/each}}
+            <button type="button" class="dbzf-btn dbzf-btn--dashed dbzf-btn--sm" data-action="custom-skill-add" style="align-self:flex-start">+ Add Custom Skill</button>
+          </details>
+        </section>
+      </div>
+    </section>
+
+    {{!-- ============================= ITEMS ============================= --}}
+    <section class="dbzf-tab-panel" data-tab-panel="items" {{#unless (eq activeTab "items")}}hidden{{/unless}}>
+      <div class="dbzf-row">
+        <span class="dbzf-note">Drag items from a compendium onto this sheet, or create one here.</span>
+        <button type="button" class="dbzf-btn dbzf-btn--primary dbzf-spacer" data-action="make-item" title="Create a new item directly on this sheet">+ Make Item</button>
+      </div>
+      {{#each itemSections as |section|}}
+        <section class="dbzf-panel dbzf-stack--sm" data-item-section="{{section.key}}">
+          <h3 class="dbzf-panel__heading">
+            <svg class="dbzf-icon" aria-hidden="true"><use href="{{../ui.sprite}}#dbzf-item-{{section.key}}"></use></svg>
+            {{section.label}}<span class="dbzf-pill">{{section.items.length}}</span>
+          </h3>
+          {{#each section.items as |item|}}
+            <details class="dbzf-item-card dbzf-owned-item-card" data-item-id="{{item.id}}">
+              <summary class="dbzf-item-card__row">
+                <img class="dbzf-item-card__img" src="{{item.img}}" alt="" />
+                <button type="button" class="dbzf-item-card__name" data-action="item-open" data-item-id="{{item.id}}" title="Open sheet">{{item.name}}</button>
+                {{#if item.meta}}<span class="dbzf-item-card__meta">{{item.meta}}</span>{{/if}}
+                <span class="dbzf-item-card__tools">
+                  {{#if item.togglable}}
+                    <button type="button" class="dbzf-toggle-badge" data-action="item-toggle-active" data-item-id="{{item.id}}"
+                            style="--c:{{#if item.active}}var(--dbzf-ready){{else}}var(--dbzf-text-faint){{/if}}"
+                            title="{{#if item.active}}Active — click to deactivate{{else}}Inactive — click to activate{{/if}}">{{#if item.active}}Active{{else}}Off{{/if}}</button>
+                  {{/if}}
+                  <button type="button" class="dbzf-btn dbzf-btn--ghost" data-action="item-to-chat" data-item-id="{{item.id}}" title="Post this item to chat">Chat</button>
+                  <button type="button" class="dbzf-btn dbzf-btn--ghost" data-action="item-open" data-item-id="{{item.id}}">Open</button>
+                  <button type="button" class="dbzf-btn dbzf-btn--ghost-danger" data-action="item-delete" data-item-id="{{item.id}}" title="Delete item">Delete</button>
+                </span>
+              </summary>
+              <div class="dbzf-item-card__body">
+                {{#if item.system.description}}<div class="dbzf-prose">{{{item.system.description}}}</div>{{/if}}
+                {{#if item.system.rulesText}}<div class="dbzf-prose">{{{item.system.rulesText}}}</div>{{/if}}
+                {{#if item.effectLines.length}}
+                  <div class="dbzf-field">
+                    <span class="dbzf-label dbzf-label--faint">Effects</span>
+                    {{#each item.effectLines as |line|}}<span class="dbzf-note" style="font-size:12px">{{line}}</span>{{/each}}
+                  </div>
+                {{/if}}
+                {{#if item.qualityChips.length}}
+                  <div class="dbzf-row">
+                    <span class="dbzf-label dbzf-label--faint">Qualities</span>
+                    {{#each item.qualityChips as |chip|}}<span class="dbzf-badge" style="--c:var(--dbzf-warn)">{{chip}}</span>{{/each}}
+                  </div>
+                {{/if}}
+                {{#if (eq item.type "armor")}}
+                  <div class="dbzf-field">
+                    <div class="dbzf-row"><span class="dbzf-label">Armor HP</span><span class="dbzf-item-card__meta dbzf-spacer">{{item.system.currentHits}} / {{item.system.bonusHits}}{{#if item.system.destroyed}} &mdash; DESTROYED{{/if}}</span></div>
+                    <div class="dbzf-meter"><div class="dbzf-meter__fill" style="--fill:{{item.armorPct}}%"></div></div>
+                  </div>
+                {{/if}}
+              </div>
+            </details>
+          {{else}}
+            <p class="dbzf-empty">Nothing here yet &mdash; drag {{section.label}} onto the sheet or use Make Item</p>
+          {{/each}}
+        </section>
+      {{/each}}
+    </section>
+
+    {{!-- ========================== PROGRESSION ========================== --}}
+    <section class="dbzf-tab-panel" data-tab-panel="progression" {{#unless (eq activeTab "progression")}}hidden{{/unless}}>
+      <section class="dbzf-panel" style="max-width:560px">
+        <h3 class="dbzf-panel__heading dbzf-panel__heading--lg">Progression</h3>
+        <div class="dbzf-grid-3">
+          <div class="dbzf-field"><span class="dbzf-label">EXP Total</span><input name="system.experience.total" type="number" class="dbzf-input--num" value="{{system.experience.total}}" /></div>
+          <div class="dbzf-field"><span class="dbzf-label">EXP Unspent</span><input name="system.experience.unspent" type="number" class="dbzf-input--num" value="{{system.experience.unspent}}" /></div>
+          <div class="dbzf-field"><span class="dbzf-label">Zeni</span><input name="system.finances.zeni" type="number" class="dbzf-input--num" value="{{system.finances.zeni}}" /></div>
+        </div>
+        <button type="button" class="dbzf-btn dbzf-btn--outline" data-action="xp-tool" style="align-self:flex-start">Fight XP Tool</button>
+      </section>
+    </section>
+
+    {{!-- ============================== BIO ============================== --}}
+    <section class="dbzf-tab-panel" data-tab-panel="bio" {{#unless (eq activeTab "bio")}}hidden{{/unless}}>
+      <div class="dbzf-cols dbzf-cols--2-1">
+        <section class="dbzf-panel">
+          <h3 class="dbzf-panel__heading dbzf-panel__heading--lg">Biography</h3>
+          <div class="dbzf-editor-field">
+            <prose-mirror name="system.biography" value="{{system.biography}}" toggled>{{{enriched.biography}}}</prose-mirror>
+          </div>
+        </section>
+        <section class="dbzf-panel">
+          <h3 class="dbzf-panel__heading dbzf-panel__heading--lg">Identity</h3>
+          <div class="dbzf-grid-2">
+            <div class="dbzf-field"><span class="dbzf-label">Age</span><input name="system.identity.age" type="text" value="{{system.identity.age}}" /></div>
+            <div class="dbzf-field"><span class="dbzf-label">Birth Year</span><input name="system.identity.birthYear" type="text" value="{{system.identity.birthYear}}" /></div>
+            <div class="dbzf-field"><span class="dbzf-label">Sex</span><input name="system.identity.sex" type="text" value="{{system.identity.sex}}" /></div>
+            <div class="dbzf-field"><span class="dbzf-label">Hair</span><input name="system.identity.hair" type="text" value="{{system.identity.hair}}" /></div>
+            <div class="dbzf-field"><span class="dbzf-label">Eyes</span><input name="system.identity.eyes" type="text" value="{{system.identity.eyes}}" /></div>
+            <div class="dbzf-field"><span class="dbzf-label">Build</span><input name="system.identity.build" type="text" value="{{system.identity.build}}" /></div>
+            <div class="dbzf-field"><span class="dbzf-label">Sexuality</span><input name="system.identity.sexuality" type="text" value="{{system.identity.sexuality}}" /></div>
+            <div class="dbzf-field"><span class="dbzf-label">Gimmick</span><input name="system.identity.gimmick" type="text" value="{{system.identity.gimmick}}" /></div>
+          </div>
+          <div class="dbzf-field"><span class="dbzf-label">Personality</span><input name="system.identity.personality" type="text" value="{{system.identity.personality}}" /></div>
+          <div class="dbzf-field"><span class="dbzf-label">Species</span>
+            <select name="system.identity.species">
+              <option value="">Custom / Unset</option>
+              {{selectOptions speciesChoices selected=system.identity.species valueAttr="key" labelAttr="label"}}
+            </select>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    {{!-- =============================== GM ============================== --}}
+    {{#if isGM}}
+    <section class="dbzf-tab-panel" data-tab-panel="gm" {{#unless (eq activeTab "gm")}}hidden{{/unless}}>
+      <section class="dbzf-panel" style="max-width:660px">
+        <h3 class="dbzf-panel__heading dbzf-panel__heading--lg">Power Calibration <span class="dbzf-badge" style="--c:var(--dbzf-warn)">GM Only</span></h3>
+        <div class="dbzf-grid-3">
+          <div class="dbzf-field"><span class="dbzf-label">BP Mode</span>
+            <select name="system.powerScaling.battlePowerMode">
+              {{selectOptions powerModeChoices selected=system.powerScaling.battlePowerMode valueAttr="key" labelAttr="label"}}
+            </select>
+          </div>
+          <div class="dbzf-field"><span class="dbzf-label">Canon BP</span><input name="system.powerScaling.canonPowerLevel" type="number" class="dbzf-input--num" value="{{system.powerScaling.canonPowerLevel}}" /></div>
+          <div class="dbzf-field"><span class="dbzf-label">Canon Source</span><input name="system.powerScaling.canonPowerSource" type="text" value="{{system.powerScaling.canonPowerSource}}" /></div>
+          <div class="dbzf-field"><span class="dbzf-label">Strict Formula BP</span><output class="dbzf-char-eff" style="text-align:left">{{system.powerScaling.strictFormulaBattlePower}}</output></div>
+          <div class="dbzf-field"><span class="dbzf-label">XP Band BP</span><output class="dbzf-char-eff" style="text-align:left">{{system.powerScaling.xpBandSuggestedBattlePower}}</output></div>
+          <div class="dbzf-field"><span class="dbzf-label">Current BP XP</span><output class="dbzf-char-eff" style="text-align:left">{{system.powerScaling.xpFromCurrentBattlePower}}</output></div>
+        </div>
+        <div class="dbzf-actions">
+          <button type="button" class="dbzf-btn dbzf-btn--primary" data-action="gm-apply-suggested-bp">Apply Suggested BP</button>
+          <button type="button" class="dbzf-btn dbzf-btn--outline" data-action="gm-calibration-tool">Calibration Report</button>
+          <button type="button" class="dbzf-btn dbzf-btn--outline" data-action="gm-tools-panel">GM Tools</button>
+        </div>
+      </section>
+    </section>
+    {{/if}}
+
+  </main>
+</form>

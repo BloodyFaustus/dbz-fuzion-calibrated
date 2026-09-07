@@ -1,0 +1,96 @@
+<article class="dbzf-chat-card" data-kind="attack">
+  <header class="dbzf-chat-header-with-img">
+    {{#if chatImg}}<img src="{{chatImg}}" alt="" />{{/if}}
+    <div>
+      <h3>{{attackName}}</h3>
+      <p>{{actorName}} - {{attackType}}</p>
+      {{#if techniqueName}}<p>Technique: {{techniqueName}}</p>{{/if}}
+      {{#if weaponName}}<p>Weapon: {{weaponName}}</p>{{/if}}
+    </div>
+  </header>
+  <dl class="dbzf-chat-grid">
+    <dt>Attack</dt>
+    <dd title="{{attackDiceTooltip}}">{{attackTotal}}{{#if attackDiceResults.length}} <span class="dbzf-attack-dice" title="{{attackDiceTooltip}}">{{#each attackDiceResults as |die|}}<span class="dbzf-die">{{die}}</span>{{/each}}</span>{{/if}}</dd>
+    <dt>Damage</dt>
+    <dd title="{{damageRollResult}}">{{damageTotal}}</dd>
+    <dt>Total Ki Spent</dt>
+    <dd>{{totalKiCost}}</dd>
+    {{#if damageKiSpent}}
+      <dt>Ki for Damage</dt>
+      <dd>{{damageKiSpent}} (+{{kiDamageDice}}d6)</dd>
+    {{/if}}
+    {{#if activationKiCost}}
+      <dt>Technique Ki Cost</dt>
+      <dd>{{activationKiCost}}</dd>
+    {{/if}}
+    {{#if techniqueBonusDice}}
+      <dt>Technique Damage Dice</dt>
+      <dd>+{{techniqueBonusDice}}d6</dd>
+    {{/if}}
+    {{#if qualityKiCost}}
+      <dt>Quality Ki Cost</dt>
+      <dd>{{qualityKiCost}}</dd>
+    {{/if}}
+    <dt>Ki Remaining</dt>
+    <dd>{{kiRemaining}}</dd>
+  </dl>
+  {{#if manualBonusDice}}
+    <p class="dbzf-chat-warning">Manual Bonus Dice: +{{manualBonusDice}}d6 GM-adjudicated</p>
+  {{/if}}
+  {{#if qualities}}
+    <p class="dbzf-chat-qualities">{{qualities}}</p>
+  {{/if}}
+  {{#if qualitySummary}}
+    <p class="dbzf-chat-qualities">Parsed: {{qualitySummary}}</p>
+  {{/if}}
+  {{#if tags}}
+    <p class="dbzf-chat-tags">Tags: {{tags}}</p>
+  {{/if}}
+  {{#if qualityNotes.length}}
+    <ul class="dbzf-chat-notes">
+      {{#each qualityNotes as |note|}}
+        <li>{{note}}</li>
+      {{/each}}
+    </ul>
+  {{/if}}
+  <div class="dbzf-chat-actions">
+    <button type="button" data-action="dbzf-apply-damage">Take Damage</button>
+    <button type="button" data-action="dbzf-apply-damage-secondary">Take Half Damage</button>
+    <button type="button" data-action="dbzf-apply-damage-targets">Apply to All Selected/Targeted</button>
+  </div>
+  {{#if autoZeroDamage}}
+    <div class="dbzf-chat-actions">
+      <button type="button" data-action="dbzf-apply-force-damage">Deal Damage Anyway</button>
+      <button type="button" data-action="dbzf-apply-force-damage-targets">Deal Damage: All Selected/Targeted</button>
+    </div>
+    <p class="dbzf-chat-notes">This attack deals <strong>no damage</strong> automatically &mdash; {{zeroDamageReason}}. The buttons above apply the conditions only. Use these if it is meant to do both.</p>
+  {{else if hasControlQualities}}
+    <div class="dbzf-chat-actions">
+      <button type="button" data-action="dbzf-apply-effects">Apply Effects Only (No Damage)</button>
+      <button type="button" data-action="dbzf-apply-effects-targets">Effects Only: All Selected/Targeted</button>
+    </div>
+    <p class="dbzf-chat-notes">Control qualities detected ({{controlQualityNames}}). Use these to land the condition without dealing damage.</p>
+  {{/if}}
+  {{#if damageApplication}}
+    <dl class="dbzf-chat-grid">
+      <dt>Target</dt><dd>{{damageApplication.targetName}}</dd>
+      <dt>Raw Damage</dt><dd title="{{damageRollResult}}">{{damageApplication.rawDamage}}</dd>
+      <dt>Defense</dt><dd>{{damageApplication.defense}}</dd>
+      <dt>Deadly</dt><dd>{{damageApplication.deadly}}</dd>
+      <dt>Adjusted Defense</dt><dd>{{damageApplication.adjustedDefense}}</dd>
+      <dt>Effective Damage</dt><dd>{{damageApplication.effectiveDamage}}</dd>
+      <dt>Temp HITs</dt><dd>{{damageApplication.tempHitsBefore}} -> {{damageApplication.tempHitsAfter}}</dd>
+      <dt>HITs</dt><dd>{{damageApplication.hitsBefore}} -> {{damageApplication.hitsAfter}}</dd>
+    </dl>
+  {{/if}}
+  <details>
+    <summary>Details</summary>
+    <p title="{{attackFormula}}">Attack: {{attackFormula}}</p>
+    <p title="{{damageFormula}}">Damage: {{damageFormula}}</p>
+    <ul>
+      {{#each breakdown as |line|}}
+        <li>{{line}}</li>
+      {{/each}}
+    </ul>
+  </details>
+</article>

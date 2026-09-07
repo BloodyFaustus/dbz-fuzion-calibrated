@@ -1,0 +1,14 @@
+{
+  "DBZF.SystemTitle": "DBZ Fuzion Redux",
+  "TYPES.Actor.character": "Character",
+  "TYPES.Item.technique": "Technique",
+  "TYPES.Item.weapon": "Weapon",
+  "TYPES.Item.armor": "Armor",
+  "TYPES.Item.equipment": "Equipment",
+  "TYPES.Item.consumable": "Consumable",
+  "TYPES.Item.quality": "Quality",
+  "TYPES.Item.trait": "Trait",
+  "TYPES.Item.boost": "Boost",
+  "TYPES.Item.transformation": "Transformation",
+  "TYPES.Item.species": "Species"
+}

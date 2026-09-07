@@ -1,0 +1,118 @@
+{
+    "id":  "dbz-fuzion-calibrated",
+    "title":  "DBZ Fuzion Redux - Calibrated GM Variant",
+    "description":  "A calibrated GM-focused native Foundry VTT system fork for DBZ Fuzion Redux.",
+    "version":  "20.45",
+    "compatibility":  {
+                          "minimum":  "13",
+                          "verified":  "13"
+                      },
+    "authors":  [
+                    {
+                        "name":  "DBZ Fuzion Foundry Project"
+                    }
+                ],
+    "esmodules":  [
+                      "dbz-fuzion-calibrated.mjs"
+                  ],
+    "styles":  [
+                   "styles/dbz-fuzion-calibrated.css"
+               ],
+    "languages":  [
+                      {
+                          "lang":  "en",
+                          "name":  "English",
+                          "path":  "lang/en.json"
+                      }
+                  ],
+    "documentTypes":  {
+                          "Actor":  {
+                                        "character":  {
+
+                                                      }
+                                    },
+                          "Item":  {
+                                       "technique":  {
+
+                                                     },
+                                       "quality":  {
+
+                                                   },
+                                       "transformation":  {
+
+                                                          },
+                                       "species":  {
+
+                                                   },
+                                       "trait":  {
+
+                                                 },
+                                       "boost":  {
+
+                                                 },
+                                       "equipment":  {
+
+                                                     },
+                                       "weapon":  {
+
+                                                  },
+                                       "armor":  {
+
+                                                 },
+                                       "consumable":  {
+
+                                                      }
+                                   }
+                      },
+    "packs":  [
+                  {
+                      "name":  "transformations",
+                      "label":  "DBZ Fuzion Transformations",
+                      "path":  "packs/transformations",
+                      "type":  "Item",
+                      "system":  "dbz-fuzion-calibrated"
+                  },
+                  {
+                      "name":  "qualities",
+                      "label":  "DBZ Fuzion Qualities",
+                      "path":  "packs/qualities",
+                      "type":  "Item",
+                      "system":  "dbz-fuzion-calibrated"
+                  },
+                  {
+                      "name":  "sample-actors",
+                      "label":  "DBZ Fuzion Sample Actors",
+                      "path":  "packs/sample-actors",
+                      "type":  "Actor",
+                      "system":  "dbz-fuzion-calibrated"
+                  },
+                  {
+                      "name":  "species",
+                      "label":  "DBZ Fuzion Species",
+                      "path":  "packs/species",
+                      "type":  "Item",
+                      "system":  "dbz-fuzion-calibrated"
+                  },
+                  {
+                      "name":  "sample-items",
+                      "label":  "DBZ Fuzion Sample Items",
+                      "path":  "packs/sample-items",
+                      "type":  "Item",
+                      "system":  "dbz-fuzion-calibrated"
+                  },
+                  {
+                      "name":  "core-rulebook",
+                      "label":  "DBZ Fuzion Core Rulebook",
+                      "path":  "packs/core-rulebook",
+                      "type":  "JournalEntry",
+                      "system":  "dbz-fuzion-calibrated"
+                  }
+              ],
+    "socket":  false,
+    "grid":  {
+                 "distance":  1,
+                 "units":  "m"
+             },
+    "primaryTokenAttribute":  "resources.hits",
+    "secondaryTokenAttribute":  "resources.ki"
+}

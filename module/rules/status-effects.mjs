@@ -165,17 +165,45 @@ export function registerStatusEffects() {
   }));
 }
 
+// Actors whose effects the mirror is currently rewriting. The creates and deletes it performs
+// fire preCreate/preDeleteActiveEffect, and those handlers write conditions straight back:
+// without this guard, creating an effect re-entered the mirror before the create had committed
+// (producing a duplicate), and deleting a duplicate cleared the very condition it mirrored.
+const syncing = new Set();
+
 // Mirror system conditions onto the actor's ActiveEffects so the token HUD reflects them.
 export async function syncConditionStatuses(actor) {
   if (actor?.type !== "character") return;
+  if (syncing.has(actor.id)) return;
+  syncing.add(actor.id);
+  try {
+    return await rewriteConditionStatuses(actor);
+  } finally {
+    syncing.delete(actor.id);
+  }
+}
+
+async function rewriteConditionStatuses(actor) {
   const active = new Set((actor.system.combatState?.activeConditions ?? [])
     .map(condition => DBZF_CONDITIONS[condition.key]?.id).filter(Boolean));
-  const existing = new Map(actor.effects
-    .filter(effect => effect.statuses?.size)
-    .flatMap(effect => Array.from(effect.statuses).map(status => [status, effect])));
+
+  // A status can sit on more than one effect (a duplicate from an earlier race, or one a GM
+  // added by hand), so collect EVERY effect per status rather than keeping only the last.
+  const existing = new Map();
+  for (const effect of actor.effects) {
+    for (const status of effect.statuses ?? []) {
+      if (!existing.has(status)) existing.set(status, []);
+      existing.get(status).push(effect);
+    }
+  }
 
   const toAdd = [...active].filter(id => !existing.has(id));
-  const toRemove = [...existing.keys()].filter(id => STATUS_ID_TO_KEY[id] && !active.has(id));
+  const toRemove = [];
+  for (const [id, effects] of existing) {
+    if (!STATUS_ID_TO_KEY[id]) continue;             // not one of ours; leave it alone
+    if (!active.has(id)) toRemove.push(...effects);  // condition gone: drop all of them
+    else toRemove.push(...effects.slice(1));         // condition active: keep one, drop duplicates
+  }
 
   if (toAdd.length) {
     const data = toAdd.map(id => {
@@ -185,9 +213,7 @@ export async function syncConditionStatuses(actor) {
     await actor.createEmbeddedDocuments("ActiveEffect", data);
   }
   if (toRemove.length) {
-    // Two condition updates landing back to back can both reach this point, so only delete the
-    // effects that are still there rather than throwing on one another's work.
-    const ids = toRemove.map(id => existing.get(id).id).filter(id => id && actor.effects.has(id));
+    const ids = [...new Set(toRemove.map(effect => effect.id))].filter(id => id && actor.effects.has(id));
     if (ids.length) await actor.deleteEmbeddedDocuments("ActiveEffect", ids);
   }
 }
@@ -197,6 +223,8 @@ export async function syncConditionStatuses(actor) {
 export async function onToggleStatusEffect(actor, statusId, active) {
   const key = STATUS_ID_TO_KEY[statusId];
   if (!key || actor?.type !== "character") return false;
+  // Ignore effects the mirror itself is adding or removing; only a real HUD toggle counts.
+  if (syncing.has(actor.id)) return false;
   const current = actor.system.combatState?.activeConditions ?? [];
   const match = current.find(condition => condition.key === key);
   if (active && !match) {

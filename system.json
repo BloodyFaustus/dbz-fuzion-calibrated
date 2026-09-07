@@ -2,11 +2,11 @@
     "id":  "dbz-fuzion-calibrated",
     "title":  "DBZ Fuzion Redux - Calibrated GM Variant",
     "description":  "A calibrated GM-focused native Foundry VTT system fork for DBZ Fuzion Redux.",
-    "version":  "20.45",
+    "version":  "20.46",
     "url":  "https://github.com/BloodyFaustus/dbz-fuzion-calibrated",
     "license":  "https://github.com/BloodyFaustus/dbz-fuzion-calibrated/blob/main/LICENSE",
     "manifest":  "https://raw.githubusercontent.com/BloodyFaustus/dbz-fuzion-calibrated/main/system.json",
-    "download":  "https://github.com/BloodyFaustus/dbz-fuzion-calibrated/releases/download/v20.45/dbz-fuzion-calibrated.zip",
+    "download":  "https://github.com/BloodyFaustus/dbz-fuzion-calibrated/releases/download/v20.46/dbz-fuzion-calibrated.zip",
     "compatibility":  {
                           "minimum":  "13",
                           "verified":  "13"

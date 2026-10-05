@@ -231,7 +231,8 @@ export class DBZFCharacterSheet extends HandlebarsApplicationMixin(ActorSheetV2)
     context.isGM = game.user.isGM;
     context.cssClass = this.isEditable ? "editable" : "locked";
     context.enriched = {
-      biography: await enrichHtml(actor.system.biography)
+      biography: await enrichHtml(actor.system.biography),
+      notes: await enrichHtml(actor.system.notes)
     };
     context.characteristics = [
       { key: "physical", label: "Physical", data: actor.system.characteristics.physical },

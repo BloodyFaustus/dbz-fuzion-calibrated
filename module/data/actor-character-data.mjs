@@ -54,6 +54,7 @@ export class CharacterData extends foundry.abstract.TypeDataModel {
         personality: new fields.StringField({ initial: "" })
       }),
       biography: new fields.HTMLField({ initial: "" }),
+      notes: new fields.HTMLField({ initial: "" }),
       characteristics: new fields.SchemaField({
         physical: characteristicField(1),
         mental: characteristicField(1),

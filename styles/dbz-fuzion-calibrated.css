@@ -823,10 +823,39 @@
   text-shadow: none;
 }
 
+
+/* ----------------------------- BIO tab layout ---------------------------- */
+
+/* Biography and Notes split the left column evenly and fill the sheet body, while the
+   Identity card keeps its natural height beside them (.dbzf-cols aligns children to start,
+   so only the stack opts into stretching). */
+.dbzf-tab-panel--fill { flex: 1 1 auto; min-height: 0; }
+.dbzf-bio-layout { flex: 1 1 auto; min-height: 0; }
+.dbzf-bio-stack {
+  align-self: stretch;
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: 12px;
+  min-height: 0;
+}
+.dbzf-bio-panel { min-height: 0; }
+.dbzf-editor-field--fill { flex: 1 1 auto; min-height: 0; }
+.dbz-fuzion-calibrated .dbzf-editor-field--fill prose-mirror { flex: 1 1 auto; min-height: 0; }
+/* The 340px cap suits the short inline editors elsewhere; here the editor should take
+   whatever the panel gives it. The floor stays large enough that the edit toolbar can never
+   sit on top of the typing area the way it used to. */
+.dbz-fuzion-calibrated .dbzf-editor-field--fill prose-mirror .editor-container {
+  min-height: 90px;
+  max-height: none;
+}
+
 /* ========================= responsive (container) ======================== */
 
 @container sheet (max-width: 819px) {
   .dbzf-cols--7-5, .dbzf-cols--5-7, .dbzf-cols--2-1 { grid-template-columns: minmax(0, 1fr); }
+  .dbzf-tab-panel--fill, .dbzf-bio-layout { flex: 0 1 auto; }
+  .dbzf-bio-stack { grid-template-rows: auto auto; }
+  .dbz-fuzion-calibrated .dbzf-editor-field--fill prose-mirror .editor-container { min-height: 160px; }
 }
 @container sheet (max-width: 719px) {
   .dbzf-attack-grid--special { grid-template-columns: repeat(2, minmax(0, 1fr)); }

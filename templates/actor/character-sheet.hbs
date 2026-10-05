@@ -393,15 +393,23 @@
     </section>
 
     {{!-- ============================== BIO ============================== --}}
-    <section class="dbzf-tab-panel" data-tab-panel="bio" {{#unless (eq activeTab "bio")}}hidden{{/unless}}>
-      <div class="dbzf-cols dbzf-cols--2-1">
-        <section class="dbzf-panel">
-          <h3 class="dbzf-panel__heading dbzf-panel__heading--lg">Biography</h3>
-          <div class="dbzf-editor-field">
-            <prose-mirror name="system.biography" value="{{system.biography}}" toggled>{{{enriched.biography}}}</prose-mirror>
-          </div>
-        </section>
-        <section class="dbzf-panel">
+    <section class="dbzf-tab-panel dbzf-tab-panel--fill" data-tab-panel="bio" {{#unless (eq activeTab "bio")}}hidden{{/unless}}>
+      <div class="dbzf-cols dbzf-cols--2-1 dbzf-bio-layout">
+        <div class="dbzf-bio-stack">
+          <section class="dbzf-panel dbzf-bio-panel">
+            <h3 class="dbzf-panel__heading dbzf-panel__heading--lg">Biography</h3>
+            <div class="dbzf-editor-field dbzf-editor-field--fill">
+              <prose-mirror name="system.biography" value="{{system.biography}}" toggled>{{{enriched.biography}}}</prose-mirror>
+            </div>
+          </section>
+          <section class="dbzf-panel dbzf-bio-panel">
+            <h3 class="dbzf-panel__heading dbzf-panel__heading--lg">Notes</h3>
+            <div class="dbzf-editor-field dbzf-editor-field--fill">
+              <prose-mirror name="system.notes" value="{{system.notes}}" toggled>{{{enriched.notes}}}</prose-mirror>
+            </div>
+          </section>
+        </div>
+        <section class="dbzf-panel dbzf-identity-card">
           <h3 class="dbzf-panel__heading dbzf-panel__heading--lg">Identity</h3>
           <div class="dbzf-grid-2">
             <div class="dbzf-field"><span class="dbzf-label">Age</span><input name="system.identity.age" type="text" value="{{system.identity.age}}" /></div>
@@ -409,11 +417,11 @@
             <div class="dbzf-field"><span class="dbzf-label">Sex</span><input name="system.identity.sex" type="text" value="{{system.identity.sex}}" /></div>
             <div class="dbzf-field"><span class="dbzf-label">Hair</span><input name="system.identity.hair" type="text" value="{{system.identity.hair}}" /></div>
             <div class="dbzf-field"><span class="dbzf-label">Eyes</span><input name="system.identity.eyes" type="text" value="{{system.identity.eyes}}" /></div>
-            <div class="dbzf-field"><span class="dbzf-label">Build</span><input name="system.identity.build" type="text" value="{{system.identity.build}}" /></div>
             <div class="dbzf-field"><span class="dbzf-label">Sexuality</span><input name="system.identity.sexuality" type="text" value="{{system.identity.sexuality}}" /></div>
-            <div class="dbzf-field"><span class="dbzf-label">Gimmick</span><input name="system.identity.gimmick" type="text" value="{{system.identity.gimmick}}" /></div>
           </div>
+          <div class="dbzf-field"><span class="dbzf-label">Build</span><input name="system.identity.build" type="text" value="{{system.identity.build}}" /></div>
           <div class="dbzf-field"><span class="dbzf-label">Personality</span><input name="system.identity.personality" type="text" value="{{system.identity.personality}}" /></div>
+          <div class="dbzf-field"><span class="dbzf-label">Gimmick</span><input name="system.identity.gimmick" type="text" value="{{system.identity.gimmick}}" /></div>
           <div class="dbzf-field"><span class="dbzf-label">Species</span>
             <select name="system.identity.species">
               <option value="">Custom / Unset</option>

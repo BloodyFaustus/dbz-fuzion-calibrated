@@ -960,4 +960,6 @@
 .dbzf-rulebook ul,
 .dbzf-rulebook ol { padding-left: 1.25rem; }
 .dbzf-rulebook li { margin: 0.18rem 0; }
-.dbzf-rulebook .dbzf-keywords[hidden] { display: none !important; }
+/* Keyword blocks are a hidden search index. Foundry strips the hidden attribute when a
+   journal page is created or saved, so hide them by class and not by attribute. */
+.dbzf-rulebook .dbzf-keywords { display: none !important; }

@@ -34,7 +34,7 @@ import { DBZF_TRANSFORMATIONS, getTransformationChoices } from "./module/rules/t
 import { DBZF_EFFECT_MODES, DBZF_EFFECT_TARGETS } from "./module/rules/effect-targets.mjs";
 import { DBZF_SPECIES, getSpeciesChoices } from "./module/rules/species.mjs";
 import { DBZF_STARTER_CONTENT } from "./module/rules/starter-content.mjs";
-import { seedRulebookCompendium, seedStarterCompendia, unlockSystemCompendia } from "./module/rules/compendium-seeder.mjs";
+import { seedGmGuideCompendium, seedRulebookCompendium, seedStarterCompendia, unlockSystemCompendia } from "./module/rules/compendium-seeder.mjs";
 import { migrateOnReady, pendingMigrationVersions, registerMigrationSetting, runWorldMigration } from "./module/rules/migrations.mjs";
 
 const SYSTEM_ID = "dbz-fuzion-calibrated";
@@ -88,6 +88,7 @@ Hooks.once("init", () => {
     starterContent: DBZF_STARTER_CONTENT,
     seedStarterCompendia,
     seedRulebookCompendium,
+    seedGmGuideCompendium,
     unlockSystemCompendia,
     runWorldMigration: (options) => runWorldMigration(SYSTEM_ID, game.system.version, options),
     pendingMigrationVersions

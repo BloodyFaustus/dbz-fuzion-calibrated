@@ -103,7 +103,8 @@ export async function applyDamageToTarget(targetActor, rawDamage, options = {}) 
         rating: qualityRatings.immobilization,
         saveSkill: "body",
         saveDC: qualityRatings.immobilization * 10,
-        breakDamageThreshold: qualityRatings.immobilization * 10
+        remainingTicks: qualityRatings.immobilization,
+        breakDamageThreshold: qualityRatings.immobilization * 20
       }));
     }
     if (qualityRatings.sealing) {
@@ -113,7 +114,8 @@ export async function applyDamageToTarget(targetActor, rawDamage, options = {}) 
         rating: qualityRatings.sealing,
         saveSkill: "mind",
         saveDC: qualityRatings.sealing * 10,
-        breakDamageThreshold: qualityRatings.sealing * 100
+        remainingTicks: qualityRatings.sealing,
+        breakDamageThreshold: qualityRatings.sealing * 20
       }));
     }
   }
@@ -252,7 +254,8 @@ async function applyAttackConditions(targetActor, qualityRatings, rawDamage, sou
       rating: qualityRatings.immobilization,
       saveSkill: "body",
       saveDC: qualityRatings.immobilization * 10,
-      breakDamageThreshold: qualityRatings.immobilization * 10
+      remainingTicks: qualityRatings.immobilization,
+      breakDamageThreshold: qualityRatings.immobilization * 20
     }));
   }
   if (qualityRatings.sealing) {
@@ -262,7 +265,8 @@ async function applyAttackConditions(targetActor, qualityRatings, rawDamage, sou
       rating: qualityRatings.sealing,
       saveSkill: "mind",
       saveDC: qualityRatings.sealing * 10,
-      breakDamageThreshold: qualityRatings.sealing * 100
+      remainingTicks: qualityRatings.sealing,
+      breakDamageThreshold: qualityRatings.sealing * 20
     }));
   }
   return conditionsApplied;

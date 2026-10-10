@@ -1,5 +1,6 @@
 import { DBZF_STARTER_CONTENT } from "./starter-content.mjs";
 import { DBZF_RULEBOOK_ENTRIES } from "./rulebook-content.mjs";
+import { DBZF_GM_GUIDE_ENTRIES } from "./gm-guide-content.mjs";
 
 const ITEM_PACKS = {
   species: "dbz-fuzion-calibrated.species",
@@ -13,7 +14,8 @@ const ACTOR_PACKS = {
 };
 
 const JOURNAL_PACKS = {
-  rulebook: "dbz-fuzion-calibrated.core-rulebook"
+  rulebook: "dbz-fuzion-calibrated.core-rulebook",
+  gmGuide: "dbz-fuzion-calibrated.gm-guide"
 };
 
 async function unlockPack(pack) {
@@ -74,6 +76,15 @@ export async function seedRulebookCompendium(options = {}) {
   });
 }
 
+export async function seedGmGuideCompendium(options = {}) {
+  return seedPack({
+    packId: JOURNAL_PACKS.gmGuide,
+    sourceDocs: DBZF_GM_GUIDE_ENTRIES,
+    documentClass: JournalEntry,
+    clearExisting: options.clearExisting !== false
+  });
+}
+
 export async function seedStarterCompendia(options = {}) {
   const clearExisting = options.clearExisting !== false;
   const results = [];
@@ -97,6 +108,7 @@ export async function seedStarterCompendia(options = {}) {
   }
 
   results.push(await seedRulebookCompendium({ clearExisting }));
+  results.push(await seedGmGuideCompendium({ clearExisting }));
 
   const summary = results.reduce((total, result) => {
     total.created += result.created ?? 0;

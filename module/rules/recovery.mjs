@@ -46,7 +46,7 @@ const SPECIES_RECOVERY_PHASES = {
   namekianwarrior: 1,
   namekiandragon: 1,
   namekiandemon: 1,
-  majinboo: 2
+  majinboo: 1
 };
 
 export function activeSpeciesItem(actor) {
@@ -88,7 +88,7 @@ function recoveryAmount(actor, species, settings) {
     const mode = String(species?.system?.regenerationMode ?? "").toLowerCase();
     const variant = String(species?.system?.variant ?? "").toLowerCase();
     if (mode === "namekiandragon" || (mode.startsWith("namekian") && variant === "dragon")) return mental;
-    if (mode === "majinboo") return physical * 2;
+    if (mode === "majinboo") return (physical * 2) + mental;
   }
   return physical;
 }

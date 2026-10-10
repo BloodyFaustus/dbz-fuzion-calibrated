@@ -6,9 +6,9 @@ export const DBZF_SPECIES = {
   frostDemon: { label: "Frost Demon", traits: "Vacuum compatibility and Reduction Form unlocks." },
   android: { label: "Android", traits: "Limited or infinite energy model support." },
   bioAndroid: { label: "Bio-Android", traits: "Genetic source trait support." },
-  corePerson: { label: "Core Person / Kai / Makai", traits: "Divinity, Kai, or Makai variant support." },
+  corePerson: { label: "Glind", traits: "Divinity, Kai, or Makai variant support." },
   djinn: { label: "Djinn", traits: "Mystic Nature, sealed abilities, Prisoner of Fate." },
-  majin: { label: "Majin", traits: "Demon Realm, Prisoner of Fate, Boo-lineage regeneration support." },
+  majin: { label: "Boojin", traits: "Demon Realm, Prisoner of Fate, Boo-lineage regeneration support." },
   alien: { label: "Alien / Custom Species", traits: "Generic custom species for bespoke traits." }
 };
 

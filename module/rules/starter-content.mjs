@@ -22,9 +22,9 @@ export const DBZF_STARTER_SPECIES = [
   speciesEntry("Frost Demon", "frostDemon", "Vacuum compatibility and Reduction Form unlocks. Reduction Forms increase HITs/Defense dynamically unlike most forms.", { unlockedTransformations: ["reductionForm1", "reductionForm2", "reductionForm3", "reductionForm4", "reductionForm5"] }),
   speciesEntry("Android", "android", "Artificial body. Limited Energy cannot charge normally; Infinite Energy charges 20% max Ki and may be undetectable by Ki Sense/Scouters.", { variant: "infinite", kiChargeMode: "androidInfinite", kiDecayMode: "daily", senseDetectionMode: "scouterOnly" }),
   speciesEntry("Bio-Android", "bioAndroid", "Engineered genetic composite with customizable source traits and gestation tracker support.", { senseDetectionMode: "normal" }),
-  speciesEntry("Core Person / Kai / Makai", "corePerson", "Core/Kai/Makai variants with divinity, purpose, anti-evil, or damage-energy absorption flags for GM use.", { variant: "core" }),
+  speciesEntry("Glind", "corePerson", "Core/Kai/Makai variants with divinity, purpose, anti-evil, or damage-energy absorption flags for GM use.", { variant: "core" }),
   speciesEntry("Djinn", "djinn", "Mystic Nature, sealed abilities, and Prisoner of Fate: sealing/immobilization saves are 25% worse and weaken by phase.", { regenerationMode: "none" }),
-  speciesEntry("Majin", "majin", "Demon Realm creature traits, Prisoner of Fate, and optional Majin Boo lineage regeneration every 2 phases at 2x Physical.", { regenerationMode: "majinBoo" }),
+  speciesEntry("Boojin", "majin", "Demon Realm creature traits, Prisoner of Fate, and Boo lineage regeneration every Phase at 2x Physical + 1x Mental.", { regenerationMode: "majinBoo" }),
   speciesEntry("Alien / Custom Species", "alien", "Extensible blank species item for custom species, traits, qualities, and effects.", { rulesMode: "custom" })
 ];
 

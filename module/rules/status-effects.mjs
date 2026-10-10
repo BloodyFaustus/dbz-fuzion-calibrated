@@ -42,6 +42,15 @@ export async function advanceOngoingEffects(actor) {
       continue;
     }
 
+    if (condition.key === "immobilized" || condition.key === "sealed") {
+      const current = Number(condition.remainingTicks || 0);
+      if (current <= 0) { remaining.push(condition); continue; }
+      const ticks = current - 1;
+      results.push({ key: condition.key, remainingTicks: ticks });
+      if (ticks > 0) remaining.push({ ...condition, remainingTicks: ticks });
+      continue;
+    }
+
     if (condition.key === "slow") {
       const rating = Number(condition.rating || 0) - 1;
       results.push({ key: "slow", rating });
@@ -99,8 +108,8 @@ export function highestConditionRating(actor, key) {
 export function conditionSummary(condition) {
   if (condition.key === "burn") return `Takes ${condition.value} direct damage each tick for ${condition.remainingTicks} more tick(s). Mind save DC ${condition.saveDC} can remove it.`;
   if (condition.key === "slow") return `Movement is reduced by ${condition.rating}, minimum 1. It degrades by 1 each tick.`;
-  if (condition.key === "immobilized") return `Cannot act/move normally until Body save DC ${condition.saveDC}, release, or ${condition.breakDamageThreshold} damage breaks it.`;
-  if (condition.key === "sealed") return `Cannot act/move normally until Mind save DC ${condition.saveDC}, release, or ${condition.breakDamageThreshold} damage breaks it.`;
+  if (condition.key === "immobilized") return `Cannot act/move normally for ${condition.remainingTicks || "?"} more Phase(s), or until a Body save DC ${condition.saveDC}, release, or a single hit of ${condition.breakDamageThreshold} damage (twice the DC) breaks it.`;
+  if (condition.key === "sealed") return `Cannot act/move normally for ${condition.remainingTicks || "?"} more Phase(s), or until a Mind save DC ${condition.saveDC}, release, or a single hit of ${condition.breakDamageThreshold} damage (twice the DC) breaks it.`;
   return condition.sourceName || "Custom condition.";
 }
 
@@ -113,6 +122,11 @@ function ongoingEffectsCard(actor, results, remaining) {
   const rows = results.map(result => {
     if (result.key === "burn") return `<li>Burn dealt ${result.damage} direct damage.</li>`;
     if (result.key === "slow") return `<li>Slow degraded to ${Math.max(0, result.rating)}.</li>`;
+    if (result.key === "immobilized" || result.key === "sealed") {
+      return result.remainingTicks > 0
+        ? `<li>${escapeHtml(labelCondition({ key: result.key }))} has ${result.remainingTicks} Phase(s) left.</li>`
+        : `<li>${escapeHtml(labelCondition({ key: result.key }))} ran out.</li>`;
+    }
     return `<li>${escapeHtml(result.key)} advanced.</li>`;
   }).join("");
   const active = remaining.map(condition => `${labelCondition(condition)} ${condition.rating || ""}`).join(", ") || "None";

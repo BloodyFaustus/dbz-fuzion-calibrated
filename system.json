@@ -105,6 +105,17 @@
                       "system":  "dbz-fuzion-calibrated"
                   },
                   {
+                      "name":  "gm-guide",
+                      "label":  "DBZ Fuzion GM Guide",
+                      "path":  "packs/gm-guide",
+                      "type":  "JournalEntry",
+                      "system":  "dbz-fuzion-calibrated",
+                      "ownership":  {
+                                        "PLAYER":  "NONE",
+                                        "ASSISTANT":  "OWNER"
+                                    }
+                  },
+                  {
                       "name":  "core-rulebook",
                       "label":  "DBZ Fuzion Core Rulebook",
                       "path":  "packs/core-rulebook",

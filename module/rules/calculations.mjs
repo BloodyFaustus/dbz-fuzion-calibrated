@@ -2,7 +2,7 @@ import { applyTransformation } from "./transformations.mjs";
 import { highestConditionRating } from "./status-effects.mjs";
 import { calculatePowerCalibration } from "./power-calibration.mjs";
 import { parseKiCost } from "./ki-cost-parser.mjs";
-import { effectValue, resolveValueFormula } from "./value-formula.mjs";
+import { effectValue, readsValueAsPercent, resolveCustomSkillTotal, resolveSkillTotal, resolveValueFormula, selfValueForTarget } from "./value-formula.mjs";
 
 export const DBZF_SKILL_CHARACTERISTICS = {
   fighting: "combat",
@@ -231,10 +231,32 @@ function resolveOwnedItemCosts(actor, battlePowerEffective) {
     }
     for (const effect of sys.effects ?? []) {
       effect.kiCostResolved = parseKiCost(effect.kiCostRaw ?? "", bp, { warn: false });
-      // Display-only: what the value formula currently works out to on this actor.
-      effect.valueResolved = resolveValueFormula(effect.valueFormula, actor.system) ?? toNumber(effect.value);
+      // Prefer the value this effect actually applied during the effect phases. Only fall back to
+      // resolving it here for rows that never ran (disabled, inactive item, or a target this
+      // pipeline does not apply such as attack dice and heals). The applied value is consumed so
+      // it can never be read again on a later pass.
+      const applied = effect.valueApplied;
+      delete effect.valueApplied;
+      effect.valueResolved = Number.isFinite(applied) ? applied : (resolveValueFormula(effect.valueFormula, actor.system, {
+        self: selfValueForTarget(actor.system, effect.target),
+        barePercentLiteral: readsValueAsPercent(effect)
+      }) ?? toNumber(effect.value));
+      effect.valueDisplay = formatEffectValue(effect, effect.valueResolved);
     }
   }
+}
+
+// How the resolved number actually lands, so "Percent Bonus 25%" reads "+25%" rather than a bare
+// number that looks like flat points. A ".all." row using "self" has no single answer here.
+function formatEffectValue(effect, value) {
+  if (/\b(self|this)\b/i.test(String(effect.valueFormula ?? "")) && String(effect.target ?? "").includes(".all.")) {
+    return "per target";
+  }
+  const signed = value >= 0 ? `+${value}` : String(value);
+  if (effect.mode === "percent") return `${signed}%`;
+  if (effect.mode === "multiply") return `x${value}`;
+  if (effect.mode === "override") return `=${value}`;
+  return signed;
 }
 
 function activeArmorStats(actor) {
@@ -250,33 +272,52 @@ function activeArmorStats(actor) {
 }
 
 export function applyOwnedItemEffects(system, phase, actor = system.parent) {
+  // Only record what each effect applied while deriving the actor's REAL system data. The
+  // _preUpdate clone path (maxHitsForSelection) derives a throwaway system but shares the actor's
+  // live items, so recording there would stamp a hypothetical transformed value onto items the
+  // sheet is about to read.
+  const live = Boolean(actor) && system === actor.system;
   const items = Array.from(actor?.items ?? []);
   for (const item of items) {
     if (!item.system?.active) continue;
     if (item.type === "armor" && item.system?.destroyed) continue;
     for (const effect of item.system.effects ?? []) {
       if (!effect.enabled) continue;
-      applyEffect(system, effect, phase);
+      applyEffect(system, effect, phase, live);
     }
   }
 }
 
-function applyEffect(system, effect, phase) {
+function applyEffect(system, effect, phase, live = true) {
   const target = effect.target;
-  // Resolve any stat-referencing formula (e.g. "15%(evasion)") against the live system.
-  const value = effectValue(effect, system);
-  const applyNumericMode = (object, property) => applyNumericModeValue(object, property, effect, value);
+  // Resolve any stat-referencing formula (e.g. "15%(evasion)") against the live system. The value
+  // is resolved PER APPLICATION rather than once, so "self" can mean "this skill" while a single
+  // ".all." row walks every skill. Rows without "self" resolve identically either way.
+  const applyNumericMode = (object, property, self = selfValueForTarget(system, target)) => {
+    const value = effectValue(effect, system, { self });
+    // Remember what actually landed. The display pass runs after every effect phase, so if it
+    // re-resolved the formula itself it would read the already-boosted stat and report a number
+    // larger than the one applied (a +16 showing as +20).
+    if (live) effect.valueApplied = value;
+    applyNumericModeValue(object, property, effect, value);
+  };
   if (phase === "afterTransformation") {
     if (target === "characteristics.all.effective") {
-      for (const key of Object.keys(system.characteristics ?? {})) applyNumericMode(system.characteristics[key], "effective");
+      for (const key of Object.keys(system.characteristics ?? {})) {
+        applyNumericMode(system.characteristics[key], "effective", toNumber(system.characteristics[key]?.effective));
+      }
       return;
     }
     if (target === "skills.all.effectiveRank") {
-      for (const key of Object.keys(system.skills ?? {})) applyNumericMode(system.skills[key], "effectiveRank");
+      for (const key of Object.keys(system.skills ?? {})) {
+        applyNumericMode(system.skills[key], "effectiveRank", resolveSkillTotal(system, key));
+      }
       return;
     }
     if (target === "customSkills.all.effectiveRank") {
-      for (const customSkill of system.customSkills ?? []) applyNumericMode(customSkill, "effectiveRank");
+      for (const customSkill of system.customSkills ?? []) {
+        applyNumericMode(customSkill, "effectiveRank", resolveCustomSkillTotal(system, customSkill));
+      }
       return;
     }
     if (target.startsWith("customSkills.") && target.endsWith(".effectiveRank")) {

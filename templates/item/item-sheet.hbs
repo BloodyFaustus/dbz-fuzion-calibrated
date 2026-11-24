@@ -27,7 +27,7 @@
               <input name="system.effects.{{index}}.enabled" data-effect-field="enabled" type="checkbox" {{checked effect.enabled}} title="Effect enabled" />
               <input name="system.effects.{{index}}.label" data-effect-field="label" type="text" value="{{effect.label}}" placeholder="Effect name" />
               <span class="dbzf-badge dbzf-effect-resolved" style="--c:{{#if effect.enabled}}var(--dbzf-ready){{else}}var(--dbzf-text-faint){{/if}}"
-                    title="Value this effect currently contributes">&rarr; {{effect.valueResolved}}{{#unless effect.enabled}} (off){{/unless}}</span>
+                    title="What this effect currently applies, in the units its mode uses">&rarr; {{effect.valueDisplay}}{{#unless effect.enabled}} (off){{/unless}}</span>
               <button type="button" class="dbzf-btn dbzf-btn--ghost-danger" data-action="effect-delete" data-index="{{index}}" title="Delete effect">&#10005;</button>
             </div>
             <div class="dbzf-effect-row__mid">
@@ -39,8 +39,8 @@
               </select>
               <input class="dbzf-input--num dbzf-effect-value" name="system.effects.{{index}}.value" data-effect-field="value" type="number" value="{{effect.value}}" title="Flat value" />
               <input class="dbzf-input--code dbzf-effect-formula" name="system.effects.{{index}}.valueFormula" data-effect-field="valueFormula" type="text" value="{{effect.valueFormula}}"
-                     placeholder="e.g. 15%(evasion)"
-                     title="Overrides the flat Value. Use skills (evasion, fighting...), characteristics (physical...), custom skill names, or a bare % of Battle Power. Resolved: {{effect.valueResolved}}" />
+                     placeholder="e.g. 25%(evasion)"
+                     title="Used INSTEAD of the flat Value box when filled in.&#10;25%(evasion) = 25% of the Evasion TOTAL. 25%(self) = 25% of whatever this row targets, so it works per-skill on an 'All' target. evasion = the whole total. evasion.rank = ranks only. A trailing 'total' is fine: 25%(evasion total).&#10;A bare 25% means 25% of Battle Power, except under Percent Bonus where it means 25 percent.&#10;Applies: {{effect.valueDisplay}}" />
             </div>
             <details>
               <summary class="dbzf-label dbzf-label--faint">Advanced &mdash; Ki cost, rules text</summary>

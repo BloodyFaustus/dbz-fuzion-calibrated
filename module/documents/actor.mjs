@@ -2,6 +2,24 @@ import { calculateActorDerivedData } from "../rules/calculations.mjs";
 import { getTransformation } from "../rules/transformations.mjs";
 
 export class DBZFActor extends Actor {
+  async _preCreate(data, options, user) {
+    const allowed = await super._preCreate(data, options, user);
+    if (allowed === false) return false;
+    if (this.type !== "character") return;
+    // This system has a single actor type, so an actor made by hand is almost always a player
+    // character and its token should share one sheet: unlinked was leaving Ki, HITs and
+    // transformations on the token out of step with the sheet.
+    // Compendium imports (the legacy NPC pack) are deliberately left unlinked, so dropping five
+    // copies of one NPC still gives each its own HITs and Ki.
+    // Imports from a pack, and anything written INTO a pack (the GM Tools legacy-NPC seeder uses
+    // pack.importDocument), keep Foundry's unlinked default so the stored NPCs do not carry a
+    // player-character link into every world that imports them.
+    if (options.fromCompendium || options.pack || this.pack) return;
+    // Never override a link state the incoming data asked for (duplicates, imports, macros).
+    if (foundry.utils.getProperty(data, "prototypeToken.actorLink") !== undefined) return;
+    this.updateSource({ "prototypeToken.actorLink": true });
+  }
+
   async _preUpdate(changed, options, user) {
     await super._preUpdate(changed, options, user);
     if (this.type !== "character") return;
